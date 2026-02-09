@@ -29,6 +29,10 @@ public class Node {
 	public Boolean nodeOccupied() {
 	}
 
+	public Building getBuilding() {
+		return building;
+	}
+
 	/**
 	 * 
 	 * @param building 

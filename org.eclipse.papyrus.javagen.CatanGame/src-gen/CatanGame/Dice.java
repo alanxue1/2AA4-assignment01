@@ -13,5 +13,5 @@ public interface Dice {
 	 * 
 	 * @return 
 	 */
-	public Integer roll();
+	public int roll();
 }

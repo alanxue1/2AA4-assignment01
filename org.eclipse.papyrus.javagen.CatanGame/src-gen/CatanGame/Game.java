@@ -4,6 +4,9 @@
 
 package CatanGame;
 
+import java.util.Map;
+import java.util.HashMap;
+
 /************************************************************/
 /**
  * 
@@ -44,6 +47,45 @@ public class Game {
 	 * 
 	 */
 	public void playRound() {
+	}
+
+	public void resourceDistributor(int rollResult) {
+		Map<Player, Integer> playersTouchingTile = getPlayersOnTile(rollResult);
+		for (Map.Entry<Player, Integer> input: playersTouchingTile.entrySet()) {
+			Player player = input.getKey();
+			Integer cardsToGive = input.getValue();
+
+			ResourceType resourceType = getTileResourceType(rollResult);
+			ResourceHand resourceHand = player.getResourceHand();
+
+			resourceHand.add(resourceType, cardsToGive);
+		}
+	}
+
+	public Map<Player, Integer> getPlayersOnTile(int rollResult) {
+		Map<Player, Integer> playersTouchingTile = new HashMap<>();
+		int numberOfCardsToGive = 0;
+
+		Tile tile = board.getTileById(rollResult);
+		Node[] adjacentNodes = tile.getAdjacentNodes();
+		for (Node node: adjacentNodes){
+			Building building = node.getBuilding();
+			if (building instanceof Settlement) {
+				numberOfCardsToGive = 1;
+			}
+			else {
+				numberOfCardsToGive = 2;
+			}
+			playersTouchingTile.put(building.getOwner(), numberOfCardsToGive);
+		}
+		
+		return playersTouchingTile;
+	}
+
+	public ResourceType getTileResourceType(int rollResult) {
+		Tile tile = board.getTileById(rollResult);
+		ResourceType resourceType = tile.getResourceType();
+		return resourceType;
 	}
 
 	/**

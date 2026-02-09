@@ -30,6 +30,7 @@ public abstract class Building {
 	 * @return 
 	 */
 	public Node getLocation() {
+		return location;
 	}
 
 	/**
@@ -37,5 +38,6 @@ public abstract class Building {
 	 * @return 
 	 */
 	public Player getOwner() {
+		return owner;
 	}
 }

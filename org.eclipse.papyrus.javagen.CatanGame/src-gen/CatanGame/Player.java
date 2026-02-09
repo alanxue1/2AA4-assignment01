@@ -4,6 +4,9 @@
 
 package CatanGame;
 
+import java.util.List;
+import java.util.ArrayList;
+
 /************************************************************/
 /**
  * 
@@ -24,11 +27,11 @@ class Player {
 	/**
 	 * 
 	 */
-	private Building[] buildings;
+	private List<Building> buildings = new ArrayList<>();
 	/**
 	 * 
 	 */
-	private Road[] roads;
+	private List<Road> roads = new ArrayList<>();
 	/**
 	 * 
 	 */
@@ -41,11 +44,16 @@ class Player {
 	public void takeTurn(Game game) {
 	}
 
+	public ResourceHand getResourceHand() {
+		return hand;
+	}
+
 	/**
 	 * 
 	 * @param amount 
 	 */
 	public void collectPoints(Integer amount) {
+		victoryPoints = victoryPoints + amount;
 	}
 
 	/**
@@ -53,6 +61,7 @@ class Player {
 	 * @param building 
 	 */
 	public void addBuilding(Building building) {
+		buildings.add(building);
 	}
 
 	/**
@@ -60,6 +69,7 @@ class Player {
 	 * @param building 
 	 */
 	public void deleteBuilding(Building building) {
+		buildings.remove(building);
 	}
 
 	/**
@@ -67,5 +77,6 @@ class Player {
 	 * @param road 
 	 */
 	public void addRoad(Road road) {
+		roads.add(road);
 	}
 }
