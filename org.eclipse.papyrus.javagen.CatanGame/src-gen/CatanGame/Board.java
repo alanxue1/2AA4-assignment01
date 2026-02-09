@@ -4,6 +4,9 @@
 
 package CatanGame;
 
+import java.util.List;
+import java.util.ArrayList;
+
 /************************************************************/
 /**
  * 
@@ -34,6 +37,17 @@ public class Board {
 	 * @return 
 	 */
 	public Tile getTileById(Integer id) {
+	}
+
+	public List<Tile> getTilesByToken(int token) {
+		List<Tile> sameTokenNumberTiles = new ArrayList<>();
+		for (Tile tile: tiles) {
+			if (token==tile.getNumberToken()) {
+				sameTokenNumberTiles.add(tile);
+			}
+		}
+		
+		return sameTokenNumberTiles;
 	}
 
 	/**

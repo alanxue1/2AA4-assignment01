@@ -33,6 +33,10 @@ public class Tile {
 	public ResourceType getResourceType() {
 	}
 
+	public Integer getNumberToken() {
+		return numberToken;
+	}
+
 	/**
 	 * 
 	 * @return 

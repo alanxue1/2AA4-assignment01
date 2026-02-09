@@ -4,8 +4,8 @@
 
 package CatanGame;
 
-import java.util.Map;
-import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
 
 /************************************************************/
 /**
@@ -50,42 +50,51 @@ public class Game {
 	}
 
 	public void resourceDistributor(int rollResult) {
-		Map<Player, Integer> playersTouchingTile = getPlayersOnTile(rollResult);
-		for (Map.Entry<Player, Integer> input: playersTouchingTile.entrySet()) {
-			Player player = input.getKey();
-			Integer cardsToGive = input.getValue();
+		List<ResourceDistribution> distribution = getPlayersOnTile(rollResult);
 
-			ResourceType resourceType = getTileResourceType(rollResult);
+		for (ResourceDistribution input: distribution) {
+			Player player = input.getPlayer();
 			ResourceHand resourceHand = player.getResourceHand();
-
-			resourceHand.add(resourceType, cardsToGive);
+			resourceHand.add(input.getResourceType(), input.getNumberOfCardsToGive());
 		}
 	}
 
-	public Map<Player, Integer> getPlayersOnTile(int rollResult) {
-		Map<Player, Integer> playersTouchingTile = new HashMap<>();
-		int numberOfCardsToGive = 0;
+	public List<ResourceDistribution> getPlayersOnTile(int rollResult) {
+		List<ResourceDistribution> distribution = new ArrayList<>();
+		List<Tile> sameTokenNumberTiles = new ArrayList<>();
 
-		Tile tile = board.getTileById(rollResult);
-		Node[] adjacentNodes = tile.getAdjacentNodes();
-		for (Node node: adjacentNodes){
-			Building building = node.getBuilding();
-			if (building instanceof Settlement) {
-				numberOfCardsToGive = 1;
+
+		sameTokenNumberTiles = board.getTilesByToken(rollResult);
+
+		for (Tile tile: sameTokenNumberTiles){
+			Node[] adjacentNodes = tile.getAdjacentNodes();
+			ResourceType resourceType = tile.getResourceType();
+			if (resourceType == null) { //this should account for if the tile is not meant to give out resources
+				continue;
 			}
-			else {
-				numberOfCardsToGive = 2;
+
+			for (Node node: adjacentNodes){
+				Building building = node.getBuilding();
+				if (building == null) {
+					continue;
+				}
+
+				int numberOfCardsToGive;
+				if (building instanceof Settlement) {
+					numberOfCardsToGive = 1;
+				}
+				else if (building instanceof City) {
+					numberOfCardsToGive = 2;
+				} else {
+					continue;
+				}
+				
+				Player owner = building.getOwner();
+				distribution.add(new ResourceDistribution(owner, numberOfCardsToGive, resourceType));
 			}
-			playersTouchingTile.put(building.getOwner(), numberOfCardsToGive);
 		}
 		
-		return playersTouchingTile;
-	}
-
-	public ResourceType getTileResourceType(int rollResult) {
-		Tile tile = board.getTileById(rollResult);
-		ResourceType resourceType = tile.getResourceType();
-		return resourceType;
+		return distribution;
 	}
 
 	/**
