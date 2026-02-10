@@ -6,19 +6,34 @@ package CatanGame;
 
 /************************************************************/
 /**
- * 
+ * Class to build a road at an edge for a player 
  */
 public class BuildRoad extends Action {
-	/**
-	 * 
-	 */
-	private Edge edge;
+	private Edge edge; // Edge where road will be built 
 
 	/**
-	 * 
-	 * @param game 
-	 * @param player 
+	 * Constructor to initialize the edge where the road will be built and set the action explanation
+	 * @param edge Edge where road will be built
 	 */
+	public BuildRoad(Edge edge) {
+		
+		// Verify building location is not already occupied 
+		if(edge.edgeOccupied()) {
+			throw new IllegalArgumentException("There is already a road on the edge"); 
+		}
+		this.edge = edge;
+		this.actionExplanation = "Build a road at edge " + edge.getId();
+	}
+
+	/**
+	 * Executes the action of building a road 
+	 * @param game 
+	 * @param player
+	 */
+	@Override
 	public void execute(Game game, Player player) {
+		Road road = new Road(player, edge);
+		game.addRoad(road);
+		player.addRoad(road);
 	}
 }

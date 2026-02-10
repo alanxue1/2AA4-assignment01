@@ -23,12 +23,11 @@ public class Node {
 	private Node[] adjacentNodes;
 
 	/**
-	 * 
-	 * @return 
+	 * Checks if node is occupied by a building
+	 * @return occupied status of node
 	 */
 	public Boolean nodeOccupied() {
-		Boolean isNotEmpty = building != null;
-		return isNotEmpty;
+		return building != null;
 	}
 
 	public Building getBuilding() {

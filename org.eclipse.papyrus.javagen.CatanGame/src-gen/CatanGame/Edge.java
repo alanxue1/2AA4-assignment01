@@ -27,10 +27,11 @@ public class Edge {
 	private Node second;
 
 	/**
-	 * 
-	 * @return 
+	 * Checksi if edge is occupied by a road
+	 * @return occupied status of edge
 	 */
 	public Boolean edgeOccupied() {
+		return road != null; 
 	}
 
 	/**

@@ -48,7 +48,7 @@ public class ResourceHand {
 	}
 
 	/**
-	 * @return Total number of resource cards in the hand  
+	 * @return Total number of resource cards in the hand 
 	 */
 	public int totalCards() {
 		int total = 0;

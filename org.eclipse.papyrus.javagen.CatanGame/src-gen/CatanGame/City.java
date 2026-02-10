@@ -14,6 +14,6 @@ public class City extends Building {
 	 * @return 
 	 */
 	public Integer getVictoryPoints() {
-		return 2;
+		return 2; // Cities are worth 2 victory points 
 	}
 }

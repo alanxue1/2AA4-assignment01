@@ -6,14 +6,23 @@ package CatanGame;
 
 /************************************************************/
 /**
- * 
+ * Class representing the action of skipping a turn 
  */
 public class Pass extends Action {
 	/**
-	 * 
-	 * @param game 
-	 * @param player 
+	 * Constructor to set actionExplanation attribute 
 	 */
+	public Pass() {
+		this.actionExplanation = "Turn is being skipped";
+	}
+
+	/**
+	 * Method to pass the player's turn 
+	 * @param game Game instance
+	 * @param player Player whose turn will be skipped
+	 */
+	@Override 
 	public void execute(Game game, Player player) {
+		return; // No action taken. The player just skips their turn 
 	}
 }

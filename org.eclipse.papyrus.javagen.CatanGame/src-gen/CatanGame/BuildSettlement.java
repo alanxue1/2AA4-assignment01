@@ -16,14 +16,19 @@ public class BuildSettlement extends Action {
 	 * @param node Node where settlement will be built
 	 */
 	public BuildSettlement(Node node) {
-		this.node = node;
+
+		// Verify building location is not already occupied 
+		if(node.nodeOccupied()) {
+			throw new IllegalArgumentException("There is already a building on the node");
+		}
+		this.node = node; 
 		this.actionExplanation = "Build a settlement at node " + node.getId(); 
 	}
 
 	/**
 	 * Executes the action of building a settlement 
 	 * @param game Game instance
-	 * @param player Player which action is being performed by
+	 * @param player Player which action is being performed by 
 	 */
 	@Override
 	public void execute(Game game, Player player) {
