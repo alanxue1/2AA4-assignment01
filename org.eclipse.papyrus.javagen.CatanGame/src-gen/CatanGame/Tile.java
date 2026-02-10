@@ -31,6 +31,7 @@ public class Tile {
 	 * @return 
 	 */
 	public ResourceType getResourceType() {
+		return resourceType;
 	}
 
 	public Integer getNumberToken() {
@@ -42,5 +43,6 @@ public class Tile {
 	 * @return 
 	 */
 	public Node[] getAdjacentNodes() {
+		return adjacentNodes;
 	}
 }

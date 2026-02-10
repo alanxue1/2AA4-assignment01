@@ -27,6 +27,8 @@ public class Node {
 	 * @return 
 	 */
 	public Boolean nodeOccupied() {
+		Boolean isNotEmpty = building != null;
+		return isNotEmpty;
 	}
 
 	public Building getBuilding() {
@@ -38,5 +40,6 @@ public class Node {
 	 * @param building 
 	 */
 	public void addBuilding(Building building) {
+		this.building = building;
 	}
 }
