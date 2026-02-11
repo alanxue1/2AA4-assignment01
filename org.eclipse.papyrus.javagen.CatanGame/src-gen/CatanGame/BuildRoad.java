@@ -17,12 +17,12 @@ public class BuildRoad extends Action {
 	 */
 	public BuildRoad(Edge edge) {
 
-		// Verify building location is not already occupied 
+		// Verify building location is not already occupie d
 		if(edge.edgeOccupied()) {
 			throw new IllegalArgumentException("There is already a road on the edge"); 
 		}
 		this.edge = edge;
-		this.actionExplanation = "Build a road at edge " + edge.getId();
+		this.actionExplanation = "Built a road at an edge"; 
 	}
 
 	/**
