@@ -5,7 +5,7 @@ import java.util.ArrayList;
 /**
  * 
  */
-class Player {
+public class Player {
 	
 	private int id; // Player id #
 	private int victoryPoints; // total # of victory points the player has
@@ -16,28 +16,37 @@ class Player {
 
 	/**
 	 * Constructor to initialize Player with a decision making Agent
+	 * @param id
 	 * @param agent
 	 */
 	public Player(int id, Agent agent) {
 		this.id = id;
-		this.agent = agent;
+		this.agent = (agent == null) ? new Agent(id) : agent;
+		this.agent.setControlledPlayer(this);
 		this.hand = new ResourceHand();
 		this.victoryPoints = 0; 
 		this.buildings = new ArrayList<>();
 		this.roads = new ArrayList<>();
 	}
 
-	public int getVictoryPoints() {
-		return victoryPoints;
+	public Player(Agent agent) {
+		this(-1, agent);
 	}
 
 	/**
 	 * Player takes a turn by choosing action through the agent and executing it
 	 * @param game Game instance
 	 */
-	public void takeTurn(Game game) {
+	public Action takeTurn(Game game) {
+		if (agent == null) {
+			return new Pass();
+		}
 		Action action = agent.chooseAction(this,game); 
+		if (action == null) {
+			action = new Pass();
+		}
 		action.execute(game,this);
+		return action;
 	}
 
 	/**
@@ -54,7 +63,6 @@ class Player {
 	 */
 	public void addBuilding(Building building) {
 		buildings.add(building);
-		victoryPoints += building.getVictoryPoints();
 	}
 
 	/**
@@ -63,7 +71,6 @@ class Player {
 	 */
 	public void deleteBuilding(Building building) {
 		buildings.remove(building);
-		victoryPoints -= building.getVictoryPoints();
 	}
 
 	/**
@@ -78,11 +85,31 @@ class Player {
 	 * Returns the player's current hand of resource cards
 	 * @return ResourceHand representing the player's current hand
 	 */
-	public ResourceHand getResourceHand() {
+	public ResourceHand viewHand() {
 		return hand; 
 	}
 
-	public int getId(){
+	public ResourceHand getResourceHand() {
+		return hand;
+	}
+
+	public int getId() {
 		return id;
+	}
+
+	public int getVictoryPoints() {
+		return victoryPoints;
+	}
+
+	public List<Building> getBuildings() {
+		return new ArrayList<>(buildings);
+	}
+
+	public List<Road> getRoads() {
+		return new ArrayList<>(roads);
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 }

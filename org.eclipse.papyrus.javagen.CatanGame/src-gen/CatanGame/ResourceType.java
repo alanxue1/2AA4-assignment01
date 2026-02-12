@@ -13,5 +13,6 @@ public enum ResourceType {
 	BRICK,
 	SHEEP,
 	WHEAT,
+	DESERT,
 	ORE;
 }

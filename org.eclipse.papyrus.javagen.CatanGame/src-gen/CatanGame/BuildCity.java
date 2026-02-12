@@ -16,13 +16,12 @@ public class BuildCity extends Action {
 	 * @param node Node where city will be built
 	 */
 	public BuildCity(Node node) {
-		
-		// Verify building location is not already occupied 
-		if(node.nodeOccupied()) {
-			throw new IllegalArgumentException("There is already a building on the node");
-		}
 		this.node = node;
-		this.actionExplanation = "Build a city at node " + node.getId();
+		if (node == null) {
+			this.actionExplanation = "skip invalid city upgrade";
+			return;
+		}
+		this.actionExplanation = "upgrade settlement to city at node " + node.getId();
 	}
 	/**
 	 * Executes the action of building a city 
@@ -31,8 +30,26 @@ public class BuildCity extends Action {
 	 */
 	@Override 
 	public void execute(Game game, Player player) {
+		if (node == null) {
+			return;
+		}
+		Building currentBuilding = node.getBuilding();
+		if (!(currentBuilding instanceof Settlement) || currentBuilding.getOwner() != player) {
+			return;
+		}
+
+		ResourceHand hand = player.getResourceHand();
+		if (!hand.canAfford(BuildCosts.CITY)) {
+			return;
+		}
+		hand.spend(BuildCosts.CITY);
+
+		player.deleteBuilding(currentBuilding);
+		game.removeBuilding(currentBuilding);
+
 		City city = new City(player, node);
+		game.addBuilding(city); 
 		player.addBuilding(city);
-		player.collectPoints(city.getVictoryPoints());
+		player.collectPoints(city.getVictoryPoints() - currentBuilding.getVictoryPoints());
 	}
 }

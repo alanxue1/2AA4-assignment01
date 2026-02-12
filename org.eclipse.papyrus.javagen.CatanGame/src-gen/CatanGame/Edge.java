@@ -37,9 +37,13 @@ public class Edge {
 	 * @param road the road to be placed on the edge
 	 */
 	public void addRoad(Road road) {
-		if(edgeOccupied()) {
-			throw new IllegalStateException("Edge already occupied by a road");
+		if (road == null || edgeOccupied()) {
+			return;
 		}
 		this.road = road;
+	}
+
+	public Road getRoad() {
+		return road;
 	}
 }

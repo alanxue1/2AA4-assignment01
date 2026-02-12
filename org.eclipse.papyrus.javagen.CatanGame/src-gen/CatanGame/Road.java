@@ -18,6 +18,14 @@ public class Road {
 	 */
 	private Edge location;
 
+	public Road(Player owner, Edge location) {
+		this.owner = owner;
+		this.location = location;
+		if (location != null && !location.edgeOccupied()) {
+			location.addRoad(this);
+		}
+	}
+
 	/**
 	 * 
 	 * @return 
@@ -26,9 +34,7 @@ public class Road {
 		return location;
 	}
 
-	public Road(Player owner, Edge location) {
-		this.owner = owner;
-		this.location = location;
-		location.addRoad(this);
+	public Player getOwner() {
+		return owner;
 	}
 }

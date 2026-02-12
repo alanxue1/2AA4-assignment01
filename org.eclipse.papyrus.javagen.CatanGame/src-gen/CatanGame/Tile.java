@@ -31,12 +31,17 @@ public class Tile {
     }
 
 	public void addAdjacentNode(Node node) {
+		if (node == null) {
+			return;
+		}
 		for(int i = 0; i < adjacentNodes.length; i++) {
+			if (adjacentNodes[i] == node) {
+				return;
+			}
 			if(adjacentNodes[i] == null) {
 				adjacentNodes[i] = node; 
 				return;
 			}
 		}
-		throw new IllegalStateException("Tile cannot have more than 6 adjacent nodes");
 	}
 }

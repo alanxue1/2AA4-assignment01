@@ -16,13 +16,12 @@ public class BuildRoad extends Action {
 	 * @param edge Edge where road will be built
 	 */
 	public BuildRoad(Edge edge) {
-
-		// Verify building location is not already occupie d
-		if(edge.edgeOccupied()) {
-			throw new IllegalArgumentException("There is already a road on the edge"); 
-		}
 		this.edge = edge;
-		this.actionExplanation = "Built a road at an edge"; 
+		if (edge == null) {
+			this.actionExplanation = "skip invalid road placement";
+			return;
+		}
+		this.actionExplanation = "build a road on edge (" + edge.getFirst().getId() + ", " + edge.getSecond().getId() + ")"; 
 	}
 
 	/**
@@ -32,7 +31,16 @@ public class BuildRoad extends Action {
 	 */
 	@Override
 	public void execute(Game game, Player player) {
+		if (edge == null || edge.edgeOccupied()) {
+			return;
+		}
+		ResourceHand hand = player.getResourceHand();
+		if (!hand.canAfford(BuildCosts.ROAD)) {
+			return;
+		}
+		hand.spend(BuildCosts.ROAD);
 		Road road = new Road(player, edge);
+		game.addRoad(road);
 		player.addRoad(road);
 	}
 }

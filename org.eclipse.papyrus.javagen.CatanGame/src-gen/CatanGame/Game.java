@@ -4,8 +4,9 @@
 
 package CatanGame;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 /************************************************************/
 /**
@@ -16,6 +17,10 @@ public class Game {
 	 * 
 	 */
 	private int currentRound;
+	/**
+	 * 
+	 */
+	private int maxRounds;
 	/**
 	 * 
 	 */
@@ -32,31 +37,77 @@ public class Game {
 	 * 
 	 */
 	private Dice dice;
+	private List<Building> buildings;
+	private List<Road> roads;
+	private Random random;
 
-	/**
-	 * 
-	 */
-	public void start() {
-		board.initializeMap();
+	public Game(Board board, Player[] players, Dice dice, int maxRounds) {
+		this.board = (board == null) ? new Board() : board;
+		this.players = sanitizePlayers(players);
+		this.dice = (dice == null) ? new MultiDice() : dice;
+		this.maxRounds = normalizeMaxRounds(maxRounds);
+		this.currentRound = 0;
+		this.gameFinished = false;
+		this.buildings = new ArrayList<>();
+		this.roads = new ArrayList<>();
+		this.random = new Random();
 
-		while (!gameFinished) {
-			playRound();
-			printRoundSummary();
-			gameFinished = checkTerminationCondition();
+		for (int i = 0; i < this.players.length; i++) {
+			Player player = this.players[i];
+			if (player != null && player.getId() <= 0) {
+				player.setId(i + 1);
+			}
 		}
 	}
 
 	/**
 	 * 
 	 */
-	public void playRound() {
-		currentRound = currentRound+1;
-
-		for (Player player: players) {
-			int resultDice = dice.roll();
-			resourceDistributor(resultDice);
-			player.takeTurn(this);
+	public void start() {
+		if (board == null) {
+			board = new Board();
 		}
+		if (board.getNodeById(0) == null || board.getTileById(0) == null) {
+			board.initializeMap();
+		}
+
+		runInitialPlacement();
+
+		while (!checkTerminationCondition()) {
+			playRound();
+		}
+
+		printFinalResults();
+	}
+
+	/**
+	 * 
+	 */
+	public void playRound() {
+		currentRound++;
+		if (players == null) {
+			return;
+		}
+		for (Player player : players) {
+			if (player == null) {
+				continue;
+			}
+			int rollResult = dice.roll();
+			if (rollResult != 7) {
+				resourceDistributor(rollResult);
+			}
+
+			Action action = player.takeTurn(this);
+			if (action == null) {
+				action = new Pass();
+			}
+			System.out.println("[" + currentRound + "] / [" + player.getId() + "]: rolled " + rollResult + ", " + action.getActionExplanation());
+
+			if (checkTerminationCondition()) {
+				break;
+			}
+		}
+		printRoundSummary();
 	}
 
 	public void resourceDistributor(int rollResult) {
@@ -73,17 +124,26 @@ public class Game {
 		List<ResourceDistribution> distribution = new ArrayList<>();
 		List<Tile> sameTokenNumberTiles = new ArrayList<>();
 
+		if (board == null) {
+			return distribution;
+		}
 
 		sameTokenNumberTiles = board.getTilesByToken(rollResult);
 
 		for (Tile tile: sameTokenNumberTiles){
+			if (tile == null) {
+				continue;
+			}
 			Node[] adjacentNodes = tile.getAdjacentNodes();
 			ResourceType resourceType = tile.getResourceType();
-			if (resourceType == null) { //this should account for if the tile is not meant to give out resources
+			if (resourceType == null || resourceType == ResourceType.DESERT) { // this should account for if the tile is not meant to give out resources
 				continue;
 			}
 
 			for (Node node: adjacentNodes){
+				if (node == null) {
+					continue;
+				}
 				Building building = node.getBuilding();
 				if (building == null) {
 					continue;
@@ -112,8 +172,19 @@ public class Game {
 	 * @return 
 	 */
 	public boolean checkTerminationCondition() {
-		for (Player player: players) {
-			if (player.getVictoryPoints()>=10) {
+		if (gameFinished) {
+			return true;
+		}
+		if (currentRound >= maxRounds) {
+			gameFinished = true;
+			return true;
+		}
+		for (Player player : players) {
+			if (player == null) {
+				continue;
+			}
+			if (player.getVictoryPoints() >= 10) {
+				gameFinished = true;
 				return true;
 			}
 		}
@@ -124,9 +195,11 @@ public class Game {
 	 * 
 	 */
 	public void printRoundSummary() {
-		System.out.println("Current Round: " + this.currentRound);
-		for (Player player: players) {
-			System.out.println("Player id: " + player.getId() + " Player Hand: " + player.getResourceHand() + " Player Victory Points: " + player.getVictoryPoints());
+		for (Player player : players) {
+			if (player == null) {
+				continue;
+			}
+			System.out.println("[" + currentRound + "] / [" + player.getId() + "]: victory points = " + player.getVictoryPoints());
 		}
 	}
 
@@ -137,16 +210,186 @@ public class Game {
 	 * @param dice 
 	 */
 	public Game(Board board, Player[] players, Dice dice) {
+		this(board, players, dice, 50);
+	}
 
-		if (board==null || players==null || dice==null || players.length<2 || players.length>4){
-			throw new IllegalArgumentException("Error: One or more of the objects given are null");
+	public void addBuilding(Building building) {
+		if (building == null) {
+			return;
 		}
+		buildings.add(building);
+	}
 
-		this.board = board;
-		this.players = players;
-		this.dice = dice;
+	public void removeBuilding(Building building) {
+		if (building == null) {
+			return;
+		}
+		buildings.remove(building);
+	}
 
-		this.currentRound = 0;
-		this.gameFinished = false;
+	public void addRoad(Road road) {
+		if (road == null || road.getRoadLocation() == null || road.getRoadLocation().getRoad() != road) {
+			return;
+		}
+		roads.add(road);
+	}
+
+	public Board getBoard() {
+		return board;
+	}
+
+	public Player[] getPlayers() {
+		return players == null ? new Player[0] : players.clone();
+	}
+
+	private void runInitialPlacement() {
+		int[] snakeOrder = new int[] {0, 1, 2, 3, 3, 2, 1, 0};
+		int[] placementCount = new int[] {0, 0, 0, 0};
+
+		for (int playerIndex : snakeOrder) {
+			Player player = players[playerIndex];
+			if (player == null) {
+				continue;
+			}
+			Node settlementNode = chooseRandomInitialSettlementNode();
+			if (settlementNode == null) {
+				continue;
+			}
+			placeInitialSettlement(player, settlementNode);
+			System.out.println("[0] / [" + player.getId() + "]: initial settlement at node " + settlementNode.getId());
+
+			Edge roadEdge = chooseRandomInitialRoadEdge(settlementNode);
+			if (roadEdge != null) {
+				placeInitialRoad(player, roadEdge);
+				System.out.println("[0] / [" + player.getId() + "]: initial road on edge (" + roadEdge.getFirst().getId() + ", " + roadEdge.getSecond().getId() + ")");
+			}
+
+			placementCount[playerIndex]++;
+			if (placementCount[playerIndex] == 2) {
+				grantInitialResources(player, settlementNode);
+			}
+		}
+	}
+
+	private Node chooseRandomInitialSettlementNode() {
+		List<Node> candidateNodes = new ArrayList<>();
+		for (Node node : board.getNodes()) {
+			if (node == null) {
+				continue;
+			}
+			if (!node.nodeOccupied() && satisfiesDistanceRule(node)) {
+				candidateNodes.add(node);
+			}
+		}
+		if (candidateNodes.isEmpty()) {
+			return null;
+		}
+		return candidateNodes.get(random.nextInt(candidateNodes.size()));
+	}
+
+	private Edge chooseRandomInitialRoadEdge(Node anchorNode) {
+		if (anchorNode == null) {
+			return null;
+		}
+		List<Edge> candidateEdges = new ArrayList<>();
+		for (Edge edge : board.getEdges()) {
+			if (edge == null || edge.edgeOccupied()) {
+				continue;
+			}
+			if (edge.getFirst() == anchorNode || edge.getSecond() == anchorNode) {
+				candidateEdges.add(edge);
+			}
+		}
+		if (candidateEdges.isEmpty()) {
+			return null;
+		}
+		return candidateEdges.get(random.nextInt(candidateEdges.size()));
+	}
+
+	private boolean satisfiesDistanceRule(Node node) {
+		for (Node adjacentNode : node.getAdjacentNodes()) {
+			if (adjacentNode != null && adjacentNode.getBuilding() != null) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private void placeInitialSettlement(Player player, Node node) {
+		if (player == null || node == null || node.nodeOccupied()) {
+			return;
+		}
+		Settlement settlement = new Settlement(player, node);
+		addBuilding(settlement);
+		player.addBuilding(settlement);
+		player.collectPoints(settlement.getVictoryPoints());
+	}
+
+	private void placeInitialRoad(Player player, Edge edge) {
+		if (player == null || edge == null || edge.edgeOccupied()) {
+			return;
+		}
+		Road road = new Road(player, edge);
+		addRoad(road);
+		player.addRoad(road);
+	}
+
+	private void grantInitialResources(Player player, Node secondSettlementNode) {
+		if (player == null || secondSettlementNode == null) {
+			return;
+		}
+		for (Tile tile : board.getTiles()) {
+			if (tile == null) {
+				continue;
+			}
+			ResourceType type = tile.getResourceType();
+			if (type == null || type == ResourceType.DESERT) {
+				continue;
+			}
+			for (Node adjacentNode : tile.getAdjacentNodes()) {
+				if (adjacentNode != null && adjacentNode == secondSettlementNode) {
+					player.getResourceHand().add(type, 1);
+					break;
+				}
+			}
+		}
+	}
+
+	private void printFinalResults() {
+		System.out.println("=== Game finished after " + currentRound + " rounds ===");
+		int highestVp = Integer.MIN_VALUE;
+		for (Player player : players) {
+			if (player == null) {
+				continue;
+			}
+			highestVp = Math.max(highestVp, player.getVictoryPoints());
+		}
+		for (Player player : players) {
+			if (player == null) {
+				continue;
+			}
+			if (player.getVictoryPoints() == highestVp) {
+				System.out.println("Winner candidate: Player " + player.getId() + " with " + player.getVictoryPoints() + " VP");
+			}
+		}
+	}
+
+	private Player[] sanitizePlayers(Player[] rawPlayers) {
+		Player[] normalized = new Player[4];
+		for (int i = 0; i < normalized.length; i++) {
+			Player provided = (rawPlayers != null && i < rawPlayers.length) ? rawPlayers[i] : null;
+			normalized[i] = (provided == null) ? new Player(i + 1, new Agent(i + 1)) : provided;
+		}
+		return normalized;
+	}
+
+	private int normalizeMaxRounds(int rounds) {
+		if (rounds < 1) {
+			return 1;
+		}
+		if (rounds > 8192) {
+			return 8192;
+		}
+		return rounds;
 	}
 }

@@ -26,10 +26,10 @@ public class ResourceHand {
 	 * @param amount Quantity of resource to add 
 	 */
 	public void add(ResourceType type, Integer amount) {
-		if(amount < 0) {
-			throw new IllegalArgumentException("Amount must be positive");
+		if (type == null || amount == null || amount <= 0) {
+			return;
 		}
-		resourceCount.put(type, resourceCount.get(type) + amount); 
+		resourceCount.put(type, getCount(type) + amount); 
 	}
 
 	/**
@@ -38,13 +38,15 @@ public class ResourceHand {
 	 * @param amount Quantity of resource to remove
 	 */
 	public void remove(ResourceType type, Integer amount) {
-		if(amount < 0) {
-			throw new IllegalArgumentException("Cannot remove negative amount of resources");
+		if (type == null || amount == null || amount <= 0) {
+			return;
 		}
-		if(resourceCount.get(type) < amount) {
-			throw new IllegalArgumentException("Insufficient resources to remove");
+		int current = getCount(type);
+		if (current == 0) {
+			return;
 		}
-		resourceCount.put(type, resourceCount.get(type) - amount);
+		int amountToRemove = Math.min(current, amount);
+		resourceCount.put(type, current - amountToRemove);
 	}
 
 	/**
@@ -56,5 +58,34 @@ public class ResourceHand {
 			total += count; 
 		}
 		return total; 
+	}
+
+	public int getCount(ResourceType type) {
+		Integer currentCount = resourceCount.get(type);
+		return currentCount == null ? 0 : currentCount;
+	}
+
+	public boolean canAfford(Map<ResourceType, Integer> cost) {
+		if (cost == null || cost.isEmpty()) {
+			return false;
+		}
+		for (Map.Entry<ResourceType, Integer> entry : cost.entrySet()) {
+			if (entry.getKey() == null || entry.getValue() == null || entry.getValue() < 0) {
+				return false;
+			}
+			if (getCount(entry.getKey()) < entry.getValue()) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public void spend(Map<ResourceType, Integer> cost) {
+		if (!canAfford(cost)) {
+			return;
+		}
+		for (Map.Entry<ResourceType, Integer> entry : cost.entrySet()) {
+			remove(entry.getKey(), entry.getValue());
+		}
 	}
 }

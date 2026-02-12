@@ -12,6 +12,7 @@ public class Board {
 	private List<Edge> edges = new ArrayList<>(); 
 
 	public void initializeMap() {
+		edges.clear();
 		DefaultBoardSetup.configureBoard(this);
 	}
 
@@ -22,7 +23,7 @@ public class Board {
 	 */
 	public void setNode(int id, Node node) {
 		if(id < 0 || id >= nodes.length) {
-			throw new IllegalArgumentException("Invalid node id");
+			return;
 		}
 		nodes[id] = node; 
 	}
@@ -34,7 +35,7 @@ public class Board {
 	 */
 	public void setTile(int id, Tile tile) {
 		if(id < 0 || id >= tiles.length) {
-			throw new IllegalArgumentException("Invalid tile id");
+			return;
 		}
 		tiles[id] = tile; 
 	}
@@ -55,14 +56,14 @@ public class Board {
 	 */
 	public Tile getTileById(int id) {
 		if(id < 0 || id >= tiles.length) {
-			throw new IllegalArgumentException("Invalid tile id");
+			return null;
 		}
 		return tiles[id];
 	}
 
 	public void addEdge(Edge edge) {
-		if(edges.size() >= 72) {
-			throw new IllegalStateException("Board cannot have more than 72 edges");
+		if (edge == null || edges.size() >= 72) {
+			return;
 		}
 		edges.add(edge);
 	}
@@ -75,6 +76,9 @@ public class Board {
 	public List<Tile> getTilesByToken(int token) {
 		List<Tile> sameTokenNumberTiles = new ArrayList<>();
 		for (Tile tile: tiles) {
+			if (tile == null) {
+				continue;
+			}
 			if (token==tile.getNumberToken()) {
 				sameTokenNumberTiles.add(tile);
 			}
@@ -90,8 +94,20 @@ public class Board {
 	 */
 	public Node getNodeById(int id) {
 		if(id < 0 || id >= nodes.length) {
-			throw new IllegalArgumentException("Invalid node id");
+			return null;
 		}
 		return nodes[id];
+	}
+
+	public Node[] getNodes() {
+		return nodes.clone();
+	}
+
+	public Tile[] getTiles() {
+		return tiles.clone();
+	}
+
+	public List<Edge> getEdges() {
+		return new ArrayList<>(edges);
 	}
 }

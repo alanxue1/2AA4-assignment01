@@ -16,13 +16,12 @@ public class BuildSettlement extends Action {
 	 * @param node Node where settlement will be built
 	 */
 	public BuildSettlement(Node node) {
-
-		// Verify building location is not already occupied 
-		if(node.nodeOccupied()) {
-			throw new IllegalArgumentException("There is already a building on the node");
-		}
 		this.node = node; 
-		this.actionExplanation = "Build a settlement at node " + node.getId(); 
+		if (node == null) {
+			this.actionExplanation = "skip invalid settlement placement";
+			return;
+		}
+		this.actionExplanation = "build a settlement at node " + node.getId(); 
 	}
 
 	/**
@@ -32,7 +31,21 @@ public class BuildSettlement extends Action {
 	 */
 	@Override
 	public void execute(Game game, Player player) {
+		if (node == null || node.nodeOccupied()) {
+			return;
+		}
+		for (Node adjacentNode : node.getAdjacentNodes()) {
+			if (adjacentNode != null && adjacentNode.getBuilding() != null) {
+				return;
+			}
+		}
+		ResourceHand hand = player.getResourceHand();
+		if (!hand.canAfford(BuildCosts.SETTLEMENT)) {
+			return;
+		}
+		hand.spend(BuildCosts.SETTLEMENT);
 		Settlement settlement = new Settlement(player, node); 
+		game.addBuilding(settlement);
 		player.addBuilding(settlement);
 		player.collectPoints(settlement.getVictoryPoints());
 	}

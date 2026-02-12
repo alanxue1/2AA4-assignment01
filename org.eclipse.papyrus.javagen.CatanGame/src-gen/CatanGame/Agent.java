@@ -3,9 +3,22 @@
 // --------------------------------------------------------
 package CatanGame; 
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 public class Agent {
 	private int id;
 	private Player controls; 
+	private final Random random = new Random();
+
+	public Agent() {
+		this(-1);
+	}
+
+	public Agent(int id) {
+		this.id = id;
+	}
 
 	/**
 	 * 
@@ -14,6 +27,138 @@ public class Agent {
 	 * @return 
 	 */
 	public Action chooseAction(Player player, Game game) {
-		return new Pass();
+		Board board = game.getBoard();
+		ResourceHand hand = player.getResourceHand();
+		List<Action> buildActions = new ArrayList<>();
+
+		if (hand.canAfford(BuildCosts.ROAD)) {
+			buildActions.addAll(getLegalRoadActions(player, board));
+		}
+		if (hand.canAfford(BuildCosts.SETTLEMENT)) {
+			buildActions.addAll(getLegalSettlementActions(player, board));
+		}
+		if (hand.canAfford(BuildCosts.CITY)) {
+			buildActions.addAll(getLegalCityActions(player));
+		}
+
+		if (hand.totalCards() > 7 && !buildActions.isEmpty()) {
+			return chooseRandomAction(buildActions);
+		}
+
+		List<Action> allActions = new ArrayList<>(buildActions);
+		allActions.add(new Pass());
+		return chooseRandomAction(allActions);
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public Player getControlledPlayer() {
+		return controls;
+	}
+
+	public void setControlledPlayer(Player controls) {
+		this.controls = controls;
+	}
+
+	private Action chooseRandomAction(List<Action> actions) {
+		return actions.get(random.nextInt(actions.size()));
+	}
+
+	private List<Action> getLegalRoadActions(Player player, Board board) {
+		List<Action> actions = new ArrayList<>();
+		for (Edge edge : board.getEdges()) {
+			if (edge == null || edge.edgeOccupied()) {
+				continue;
+			}
+			if (isRoadPlacementConnected(edge, player)) {
+				actions.add(new BuildRoad(edge));
+			}
+		}
+		return actions;
+	}
+
+	private List<Action> getLegalSettlementActions(Player player, Board board) {
+		List<Action> actions = new ArrayList<>();
+		for (Node node : board.getNodes()) {
+			if (node == null || node.nodeOccupied()) {
+				continue;
+			}
+			if (!satisfiesDistanceRule(node)) {
+				continue;
+			}
+			if (isConnectedToPlayerRoad(node, player)) {
+				actions.add(new BuildSettlement(node));
+			}
+		}
+		return actions;
+	}
+
+	private List<Action> getLegalCityActions(Player player) {
+		List<Action> actions = new ArrayList<>();
+		for (Building building : player.getBuildings()) {
+			if (building instanceof Settlement) {
+				actions.add(new BuildCity(building.getLocation()));
+			}
+		}
+		return actions;
+	}
+
+	private boolean isRoadPlacementConnected(Edge edge, Player player) {
+		Node first = edge.getFirst();
+		Node second = edge.getSecond();
+
+		if (isNodeOwnedByPlayer(first, player) || isNodeOwnedByPlayer(second, player)) {
+			return true;
+		}
+
+		for (Road road : player.getRoads()) {
+			Edge ownedEdge = road.getRoadLocation();
+			if (ownedEdge == null) {
+				continue;
+			}
+			if (sharesEndpoint(edge, ownedEdge)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean isConnectedToPlayerRoad(Node node, Player player) {
+		for (Road road : player.getRoads()) {
+			Edge edge = road.getRoadLocation();
+			if (edge == null) {
+				continue;
+			}
+			if (edge.getFirst() == node || edge.getSecond() == node) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean satisfiesDistanceRule(Node node) {
+		for (Node adjacentNode : node.getAdjacentNodes()) {
+			if (adjacentNode == null) {
+				continue;
+			}
+			if (adjacentNode.getBuilding() != null) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private boolean isNodeOwnedByPlayer(Node node, Player player) {
+		Building building = node.getBuilding();
+		return building != null && building.getOwner() == player;
+	}
+
+	private boolean sharesEndpoint(Edge first, Edge second) {
+		return first.getFirst() == second.getFirst()
+			|| first.getFirst() == second.getSecond()
+			|| first.getSecond() == second.getFirst()
+			|| first.getSecond() == second.getSecond();
 	}
 }
