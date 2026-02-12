@@ -27,7 +27,7 @@ public class Tile {
     }
 
     public Node[] getAdjacentNodes() {
-        return adjacentNodes;
+        return adjacentNodes.clone();
     }
 
 	public void addAdjacentNode(Node node) {

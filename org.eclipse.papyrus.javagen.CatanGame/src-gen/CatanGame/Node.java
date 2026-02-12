@@ -43,7 +43,7 @@ public class Node {
 	}
 
 	public Node[] getAdjacentNodes() {
-		return adjacentNodes;
+		return adjacentNodes.clone();
 	}
 
 	/**
