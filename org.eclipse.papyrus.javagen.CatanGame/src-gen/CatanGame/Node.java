@@ -6,26 +6,27 @@ package CatanGame;
 
 /************************************************************/
 /**
- * 
+ * Represents an intersection on the board
  */
 public class Node {
-	/**
-	 * 
-	 */
+	/** unique identifier for node */
 	private int id; 
-	/**
-	 *  
-	 */
+	/** building on this node */
 	private Building building = null; 
-	/**
-	 * 
-	 */
+	/** nodes adjacent to this one */
 	private Node[] adjacentNodes = new Node[3];
 
+	/**
+	 * Constructor for node
+	 * @param id unique identifier
+	 */
 	public Node(int id) {
 		this.id = id; 
 	}
 
+	/**
+	 * @return node's id
+	 */
 	public int getId() {
 		return id; 
 	}
@@ -38,22 +39,32 @@ public class Node {
 		return building != null;
 	}
 
+	/**
+	 * @return building on this node
+	 */
 	public Building getBuilding() {
 		return building;
 	}
 
+	/**
+	 * @return copy of adjacent nodes array
+	 */
 	public Node[] getAdjacentNodes() {
 		return adjacentNodes.clone();
 	}
 
 	/**
-	 * 
-	 * @param building 
+	 * Places a building on this node
+	 * @param building building to place
 	 */
 	public void addBuilding(Building building) {
 		this.building = building; 
 	}
 
+	/**
+	 * Adds node to adjacency list if not already present
+	 * @param node node to add
+	 */
 	public void addAdjacentNode(Node node) {
 		if (node == null) {
 			return;

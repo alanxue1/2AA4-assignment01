@@ -6,10 +6,11 @@ package CatanGame;
 
 /************************************************************/
 /**
- * Abstract class reprsenting an action a player can take 
+ * Abstract class representing an action a player can take 
  */
 public abstract class Action {
-	protected String actionExplanation; // Explains what the action is 
+	/** explains what the action is */
+	protected String actionExplanation; 
 
 	/**
 	 * Returns a string explaining what the action is

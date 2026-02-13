@@ -6,18 +6,19 @@ package CatanGame;
 
 /************************************************************/
 /**
- * 
+ * Abstract class representing a building
  */
 public abstract class Building {
-	/**
-	 * 
-	 */
+	/** player who owns the building */
 	private Player owner; 
-	/**
-	 * 
-	 */
+	/** node where building is placed */
 	private Node location;
 
+	/**
+	 * Constructor for building
+	 * @param owner player who owns it
+	 * @param location where it's built
+	 */
 	public Building(Player owner, Node location) {
 		this.owner = owner;
 		this.location = location;
@@ -25,22 +26,19 @@ public abstract class Building {
 	}
 
 	/**
-	 * 
-	 * @return 
+	 * @return victory points for this building
 	 */
 	public abstract int getVictoryPoints();
 
 	/**
-	 * 
-	 * @return 
+	 * @return location of building
 	 */
 	public Node getLocation() {
 		return location;
 	}
 
 	/**
-	 * 
-	 * @return 
+	 * @return owner of building
 	 */
 	public Player getOwner() {
 		return owner;

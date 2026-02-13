@@ -7,29 +7,42 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Agent that decides what actions a player should take
+ */
 public class Agent {
+	/** agent's identifier */
 	private int id;
+	/** player controlled by this agent */
 	private Player controls; 
+	/** random number generator for decision making */
 	private final Random random = new Random();
 
+	/**
+	 * Default constructor with id -1
+	 */
 	public Agent() {
 		this(-1);
 	}
 
+	/**
+	 * Constructor with specified id
+	 * @param id agent identifier
+	 */
 	public Agent(int id) {
 		this.id = id;
 	}
 
 	/**
-	 * 
-	 * @param player 
-	 * @param game 
-	 * @return 
+	 * Chooses an action for the player to take
+	 * @param player player making the decision
+	 * @param game current game state
+	 * @return action to execute
 	 */
 	public Action chooseAction(Player player, Game game) {
-		Board board = game.getBoard();
-		ResourceHand hand = player.getResourceHand();
-		List<Action> buildActions = new ArrayList<>();
+		Board board = game.getBoard(); // game board
+		ResourceHand hand = player.getResourceHand(); // player's resources
+		List<Action> buildActions = new ArrayList<>(); // possible build actions
 
 		if (hand.canAfford(BuildCosts.ROAD)) {
 			buildActions.addAll(getLegalRoadActions(player, board));
@@ -45,19 +58,29 @@ public class Agent {
 			return chooseRandomAction(buildActions);
 		}
 
-		List<Action> allActions = new ArrayList<>(buildActions);
+		List<Action> allActions = new ArrayList<>(buildActions); // all available actions
 		allActions.add(new Pass());
 		return chooseRandomAction(allActions);
 	}
 
+	/**
+	 * @return agent's id
+	 */
 	public int getId() {
 		return id;
 	}
 
+	/**
+	 * @return player controlled by agent
+	 */
 	public Player getControlledPlayer() {
 		return controls;
 	}
 
+	/**
+	 * Sets the player controlled by this agent
+	 * @param controls player to control
+	 */
 	public void setControlledPlayer(Player controls) {
 		this.controls = controls;
 	}

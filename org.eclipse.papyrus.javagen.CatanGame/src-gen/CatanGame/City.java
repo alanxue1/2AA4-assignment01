@@ -7,6 +7,8 @@ public class City extends Building {
 
 	/**
 	 * Constructor for City building 
+	 * @param owner player who owns it
+	 * @param location where it's built
 	 */
 	public City(Player owner, Node location) {
 		super(owner, location);

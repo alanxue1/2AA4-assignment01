@@ -6,18 +6,19 @@ package CatanGame;
 
 /************************************************************/
 /**
- * 
+ * Represents a road on the game board
  */
 public class Road {
-	/**
-	 * 
-	 */
+	/** player who owns the road */
 	private Player owner;
-	/**
-	 * 
-	 */
+	/** edge where road is placed */
 	private Edge location;
 
+	/**
+	 * Constructor for road
+	 * @param owner player who owns it
+	 * @param location edge where it's placed
+	 */
 	public Road(Player owner, Edge location) {
 		this.owner = owner;
 		this.location = location;
@@ -27,13 +28,15 @@ public class Road {
 	}
 
 	/**
-	 * 
-	 * @return 
+	 * @return edge where road is located
 	 */
 	public Edge getRoadLocation() {
 		return location;
 	}
 
+	/**
+	 * @return owner of the road
+	 */
 	public Player getOwner() {
 		return owner;
 	}

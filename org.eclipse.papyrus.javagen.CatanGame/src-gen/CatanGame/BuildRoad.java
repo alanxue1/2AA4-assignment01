@@ -9,7 +9,8 @@ package CatanGame;
  * Class to build a road at an edge for a player 
  */
 public class BuildRoad extends Action {
-	private Edge edge; // Edge where road will be built 
+	/** edge where road will be built */
+	private Edge edge; 
 
 	/**
 	 * Constructor to initialize the edge where the road will be built and set the action explanation
@@ -34,12 +35,12 @@ public class BuildRoad extends Action {
 		if (edge == null || edge.edgeOccupied()) {
 			return;
 		}
-		ResourceHand hand = player.getResourceHand();
+		ResourceHand hand = player.getResourceHand(); // player's resources
 		if (!hand.canAfford(BuildCosts.ROAD)) {
 			return;
 		}
 		hand.spend(BuildCosts.ROAD);
-		Road road = new Road(player, edge);
+		Road road = new Road(player, edge); // new road to build
 		game.addRoad(road);
 		player.addRoad(road);
 	}

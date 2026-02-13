@@ -1,9 +1,15 @@
 package CatanGame;
 
+/**
+ * Represents a connection between two nodes
+ */
 public class Edge {
 
+	/** road placed on this edge */
 	private Road road = null;
+	/** first node connected by edge */
 	private Node first;
+	/** second node connected by edge */
 	private Node second; 
 
 	/**
@@ -24,10 +30,16 @@ public class Edge {
 		return road != null; 
 	}
 
+	/**
+	 * @return first node
+	 */
 	public Node getFirst() {
 		return first;
 	}
 
+	/**
+	 * @return second node
+	 */
 	public Node getSecond() {
 		return second;
 	}
@@ -43,6 +55,9 @@ public class Edge {
 		this.road = road;
 	}
 
+	/**
+	 * @return road on this edge
+	 */
 	public Road getRoad() {
 		return road;
 	}

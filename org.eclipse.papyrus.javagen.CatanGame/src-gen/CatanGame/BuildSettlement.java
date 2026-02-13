@@ -9,7 +9,8 @@ package CatanGame;
  * Class that builds a settlement at a node for a player
  */
 public class BuildSettlement extends Action {
-	private Node node; // Location where settlement will be built
+	/** location where settlement will be built */
+	private Node node; 
 	
 	/**
 	 * Constructor to initialize the node where the settlement will be built and set the action explanation
@@ -39,12 +40,12 @@ public class BuildSettlement extends Action {
 				return;
 			}
 		}
-		ResourceHand hand = player.getResourceHand();
+		ResourceHand hand = player.getResourceHand(); // player's resources
 		if (!hand.canAfford(BuildCosts.SETTLEMENT)) {
 			return;
 		}
 		hand.spend(BuildCosts.SETTLEMENT);
-		Settlement settlement = new Settlement(player, node); 
+		Settlement settlement = new Settlement(player, node); // new settlement to build
 		game.addBuilding(settlement);
 		player.addBuilding(settlement);
 		player.collectPoints(settlement.getVictoryPoints());

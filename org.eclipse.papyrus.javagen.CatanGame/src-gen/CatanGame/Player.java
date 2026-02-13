@@ -16,8 +16,8 @@ public class Player {
 
 	/**
 	 * Constructor to initialize Player with a decision making Agent
-	 * @param id
-	 * @param agent
+	 * @param id player id
+	 * @param agent decision making agent
 	 */
 	public Player(int id, Agent agent) {
 		this.id = id;
@@ -29,6 +29,10 @@ public class Player {
 		this.roads = new ArrayList<>();
 	}
 
+	/**
+	 * Alternate constructor with default id
+	 * @param agent decision making agent
+	 */
 	public Player(Agent agent) {
 		this(-1, agent);
 	}
@@ -36,12 +40,13 @@ public class Player {
 	/**
 	 * Player takes a turn by choosing action through the agent and executing it
 	 * @param game Game instance
+	 * @return action that was executed
 	 */
 	public Action takeTurn(Game game) {
 		if (agent == null) {
 			return new Pass();
 		}
-		Action action = agent.chooseAction(this,game); 
+		Action action = agent.chooseAction(this,game); // agent picks an action
 		if (action == null) {
 			action = new Pass();
 		}
@@ -51,7 +56,7 @@ public class Player {
 
 	/**
 	 * Adds victory points to the player's total
-	 * @param amount 
+	 * @param amount points to add
 	 */
 	public void collectPoints(Integer amount) {
 		victoryPoints = victoryPoints + amount;
@@ -89,26 +94,45 @@ public class Player {
 		return hand; 
 	}
 
+	/**
+	 * @return player's resource hand
+	 */
 	public ResourceHand getResourceHand() {
 		return hand;
 	}
 
+	/**
+	 * @return player id
+	 */
 	public int getId() {
 		return id;
 	}
 
+	/**
+	 * @return current victory points
+	 */
 	public int getVictoryPoints() {
 		return victoryPoints;
 	}
 
+	/**
+	 * @return copy of buildings list
+	 */
 	public List<Building> getBuildings() {
 		return new ArrayList<>(buildings);
 	}
 
+	/**
+	 * @return copy of roads list
+	 */
 	public List<Road> getRoads() {
 		return new ArrayList<>(roads);
 	}
 
+	/**
+	 * Sets the player's id
+	 * @param id new player id
+	 */
 	public void setId(int id) {
 		this.id = id;
 	}

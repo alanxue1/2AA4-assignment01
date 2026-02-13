@@ -4,14 +4,13 @@
 
 package CatanGame;
 
-/************************************************************/
 /**
- * 
+ * Interface for dice rolling
  */
 public interface Dice {
 	/**
-	 * 
-	 * @return 
+	 * Rolls the dice
+	 * @return result of the roll
 	 */
 	public int roll();
 }

@@ -13,34 +13,32 @@ import java.util.Random;
  * 
  */
 public class Game {
-	/**
-	 * 
-	 */
+	/** current round number */
 	private int currentRound;
-	/**
-	 * 
-	 */
+	/** maximum rounds before game ends */
 	private int maxRounds;
-	/**
-	 * 
-	 */
+	/** whether the game has ended */
 	private boolean gameFinished;
-	/**
-	 * 
-	 */
+	/** game board */
 	private Board board;
-	/**
-	 * 
-	 */
+	/** array of players in the game */
 	private Player[] players;
-	/**
-	 * 
-	 */
+	/** dice used for rolling */
 	private Dice dice;
+	/** list of all buildings in the game */
 	private List<Building> buildings;
+	/** list of all roads in the game */
 	private List<Road> roads;
+	/** random number generator for initial placements */
 	private Random random;
 
+	/**
+	 * Constructor for the game
+	 * @param board game board
+	 * @param players array of players
+	 * @param dice dice to use
+	 * @param maxRounds max number of rounds
+	 */
 	public Game(Board board, Player[] players, Dice dice, int maxRounds) {
 		this.board = (board == null) ? new Board() : board;
 		this.players = sanitizePlayers(players);
@@ -53,7 +51,7 @@ public class Game {
 		this.random = new Random();
 
 		for (int i = 0; i < this.players.length; i++) {
-			Player player = this.players[i];
+			Player player = this.players[i]; // each player in array
 			if (player != null && player.getId() <= 0) {
 				player.setId(i + 1);
 			}
@@ -61,7 +59,7 @@ public class Game {
 	}
 
 	/**
-	 * 
+	 * Starts the game and runs until termination
 	 */
 	public void start() {
 		if (board == null) {
@@ -81,7 +79,7 @@ public class Game {
 	}
 
 	/**
-	 * 
+	 * Plays a single round where all players take turns
 	 */
 	public void playRound() {
 		currentRound++;
@@ -92,12 +90,12 @@ public class Game {
 			if (player == null) {
 				continue;
 			}
-			int rollResult = dice.roll();
+			int rollResult = dice.roll(); // dice result for this turn
 			if (rollResult != 7) {
 				resourceDistributor(rollResult);
 			}
 
-			Action action = player.takeTurn(this);
+			Action action = player.takeTurn(this); // action chosen by player
 			if (action == null) {
 				action = new Pass();
 			}
@@ -110,19 +108,28 @@ public class Game {
 		printRoundSummary();
 	}
 
+	/**
+	 * Distributes resources to players based on dice roll
+	 * @param rollResult the dice roll result
+	 */
 	public void resourceDistributor(int rollResult) {
-		List<ResourceDistribution> distribution = getPlayersOnTile(rollResult);
+		List<ResourceDistribution> distribution = getPlayersOnTile(rollResult); // list of distributions to give
 
 		for (ResourceDistribution input: distribution) {
-			Player player = input.getPlayer();
-			ResourceHand resourceHand = player.getResourceHand();
+			Player player = input.getPlayer(); // player receiving resources
+			ResourceHand resourceHand = player.getResourceHand(); // their current hand
 			resourceHand.add(input.getResourceType(), input.getNumberOfCardsToGive());
 		}
 	}
 
+	/**
+	 * Gets list of resource distributions for players with buildings on rolled tile
+	 * @param rollResult the dice roll
+	 * @return list of resource distributions
+	 */
 	public List<ResourceDistribution> getPlayersOnTile(int rollResult) {
-		List<ResourceDistribution> distribution = new ArrayList<>();
-		List<Tile> sameTokenNumberTiles = new ArrayList<>();
+		List<ResourceDistribution> distribution = new ArrayList<>(); // distributions to give out
+		List<Tile> sameTokenNumberTiles = new ArrayList<>(); // tiles with matching token
 
 		if (board == null) {
 			return distribution;
@@ -134,9 +141,9 @@ public class Game {
 			if (tile == null) {
 				continue;
 			}
-			Node[] adjacentNodes = tile.getAdjacentNodes();
-			ResourceType resourceType = tile.getResourceType();
-			if (resourceType == null || resourceType == ResourceType.DESERT) { // this should account for if the tile is not meant to give out resources
+			Node[] adjacentNodes = tile.getAdjacentNodes(); // nodes around tile
+			ResourceType resourceType = tile.getResourceType(); // resource this tile gives
+			if (resourceType == null || resourceType == ResourceType.DESERT) {
 				continue;
 			}
 
@@ -144,12 +151,12 @@ public class Game {
 				if (node == null) {
 					continue;
 				}
-				Building building = node.getBuilding();
+				Building building = node.getBuilding(); // building on this node
 				if (building == null) {
 					continue;
 				}
 
-				int numberOfCardsToGive;
+				int numberOfCardsToGive; // amount based on building type
 				if (building instanceof Settlement) {
 					numberOfCardsToGive = 1;
 				}
@@ -159,7 +166,7 @@ public class Game {
 					continue;
 				}
 				
-				Player owner = building.getOwner();
+				Player owner = building.getOwner(); // player who owns the building
 				distribution.add(new ResourceDistribution(owner, numberOfCardsToGive, resourceType));
 			}
 		}
@@ -168,8 +175,8 @@ public class Game {
 	}
 
 	/**
-	 * 
-	 * @return 
+	 * Checks if game should end
+	 * @return true if game should terminate
 	 */
 	public boolean checkTerminationCondition() {
 		if (gameFinished) {
@@ -192,7 +199,7 @@ public class Game {
 	}
 
 	/**
-	 * 
+	 * Prints victory points for all players at end of round
 	 */
 	public void printRoundSummary() {
 		for (Player player : players) {
@@ -204,15 +211,19 @@ public class Game {
 	}
 
 	/**
-	 * 
-	 * @param board 
-	 * @param players 
-	 * @param dice 
+	 * Alternate constructor with default max rounds
+	 * @param board game board
+	 * @param players array of players
+	 * @param dice dice to use
 	 */
 	public Game(Board board, Player[] players, Dice dice) {
 		this(board, players, dice, 50);
 	}
 
+	/**
+	 * Adds a building to the game
+	 * @param building building to add
+	 */
 	public void addBuilding(Building building) {
 		if (building == null) {
 			return;
@@ -220,6 +231,10 @@ public class Game {
 		buildings.add(building);
 	}
 
+	/**
+	 * Removes a building from the game
+	 * @param building building to remove
+	 */
 	public void removeBuilding(Building building) {
 		if (building == null) {
 			return;
@@ -227,6 +242,10 @@ public class Game {
 		buildings.remove(building);
 	}
 
+	/**
+	 * Adds a road to the game
+	 * @param road road to add
+	 */
 	public void addRoad(Road road) {
 		if (road == null || road.getRoadLocation() == null || road.getRoadLocation().getRoad() != road) {
 			return;
@@ -234,10 +253,16 @@ public class Game {
 		roads.add(road);
 	}
 
+	/**
+	 * @return game board
+	 */
 	public Board getBoard() {
 		return board;
 	}
 
+	/**
+	 * @return copy of players array
+	 */
 	public Player[] getPlayers() {
 		return players == null ? new Player[0] : players.clone();
 	}

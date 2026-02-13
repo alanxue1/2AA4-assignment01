@@ -9,7 +9,8 @@ package CatanGame;
  * Class that builds a city at a node for a player
  */
 public class BuildCity extends Action {
-	private Node node; // Location where city will be built 
+	/** location where city will be built */
+	private Node node; 
 
 	/**
 	 * Constructor to create the city 
@@ -33,12 +34,12 @@ public class BuildCity extends Action {
 		if (node == null) {
 			return;
 		}
-		Building currentBuilding = node.getBuilding();
+		Building currentBuilding = node.getBuilding(); // existing building at node
 		if (!(currentBuilding instanceof Settlement) || currentBuilding.getOwner() != player) {
 			return;
 		}
 
-		ResourceHand hand = player.getResourceHand();
+		ResourceHand hand = player.getResourceHand(); // player's resources
 		if (!hand.canAfford(BuildCosts.CITY)) {
 			return;
 		}
@@ -47,7 +48,7 @@ public class BuildCity extends Action {
 		player.deleteBuilding(currentBuilding);
 		game.removeBuilding(currentBuilding);
 
-		City city = new City(player, node);
+		City city = new City(player, node); // new city to build
 		game.addBuilding(city); 
 		player.addBuilding(city);
 		player.collectPoints(city.getVictoryPoints() - currentBuilding.getVictoryPoints());

@@ -10,41 +10,45 @@ import java.nio.file.Path;
  * You can pass a custom config file path as the first command-line argument.
  */
 public class Demonstrator {
+	/**
+	 * Main method to start the game
+	 * @param args command line arguments
+	 */
 	public static void main(String[] args) {
-		// 1) Read "turns: <int>" from config to decide max round limit.
-		String configPath = resolveConfigPath(args);
-		Config config = new Config(configPath);
+		String configPath = resolveConfigPath(args); // path to config file
+		Config config = new Config(configPath); // loaded configuration
 
-		// 2) Build the fixed default map required for repeatable debugging/testing.
-		Board board = new Board();
+		Board board = new Board(); // game board
 		DefaultBoardSetup.configureBoard(board);
 
-		// 3) Create four random agents and bind one to each player.
-		Player[] players = new Player[4];
+		Player[] players = new Player[4]; // array of all players
 		for (int i = 0; i < players.length; i++) {
-			Agent agent = new Agent(i + 1);
+			Agent agent = new Agent(i + 1); // agent for this player
 			players[i] = new Player(i + 1, agent);
 		}
 
-		// 4) Use two regular dice to model standard Catan rolls.
-		Dice dice = new MultiDice();
+		Dice dice = new MultiDice(); // dice for rolling
 
-		// 5) Start the simulation and print all turn logs/round summaries to console.
-		Game game = new Game(board, players, dice, config.getMaxRounds());
+		Game game = new Game(board, players, dice, config.getMaxRounds()); // game instance
 		game.start();
 	}
 
+	/**
+	 * Resolves path to config file from arguments or defaults
+	 * @param args command line args
+	 * @return path to config file
+	 */
 	private static String resolveConfigPath(String[] args) {
 		if (args != null && args.length > 0 && args[0] != null && !args[0].isBlank()) {
 			return args[0];
 		}
 
-		Path localConfig = Path.of("config.txt");
+		Path localConfig = Path.of("config.txt"); // local config file
 		if (Files.exists(localConfig)) {
 			return localConfig.toString();
 		}
 
-		Path repoRootConfig = Path.of("org.eclipse.papyrus.javagen.CatanGame", "config.txt");
+		Path repoRootConfig = Path.of("org.eclipse.papyrus.javagen.CatanGame", "config.txt"); // repo config
 		return repoRootConfig.toString();
 	}
 }

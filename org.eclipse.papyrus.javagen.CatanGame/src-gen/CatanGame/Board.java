@@ -7,10 +7,16 @@ import java.util.ArrayList;
  * Class representing a game board in Catan 
  */
 public class Board {
+	/** array of tiles on the board */
 	private Tile[] tiles = new Tile[19];
+	/** array of nodes on the board */
 	private Node[] nodes = new Node[54];
+	/** list of edges on the board */
 	private List<Edge> edges = new ArrayList<>(); 
 
+	/**
+	 * Initializes the board with default configuration
+	 */
 	public void initializeMap() {
 		edges.clear();
 		DefaultBoardSetup.configureBoard(this);
@@ -40,6 +46,12 @@ public class Board {
 		tiles[id] = tile; 
 	}
 
+	/**
+	 * Gets edge connecting two nodes
+	 * @param first first node
+	 * @param second second node
+	 * @return edge between nodes or null
+	 */
 	public Edge getEdge(Node first, Node second) {
 		for (Edge edge: edges) {
 			if ((edge.getFirst() == first && edge.getSecond() == second) || (edge.getFirst() == second && edge.getSecond() == first)) {
@@ -61,6 +73,10 @@ public class Board {
 		return tiles[id];
 	}
 
+	/**
+	 * Adds edge to the board
+	 * @param edge edge to add
+	 */
 	public void addEdge(Edge edge) {
 		if (edge == null || edges.size() >= 72) {
 			return;
@@ -99,14 +115,23 @@ public class Board {
 		return nodes[id];
 	}
 
+	/**
+	 * @return copy of nodes array
+	 */
 	public Node[] getNodes() {
 		return nodes.clone();
 	}
 
+	/**
+	 * @return copy of tiles array
+	 */
 	public Tile[] getTiles() {
 		return tiles.clone();
 	}
 
+	/**
+	 * @return copy of edges list
+	 */
 	public List<Edge> getEdges() {
 		return new ArrayList<>(edges);
 	}
