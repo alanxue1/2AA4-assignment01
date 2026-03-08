@@ -12,14 +12,14 @@ public class Player {
 	private ResourceHand hand; // Player's current hand of resource cards
 	private List<Building> buildings = new ArrayList<>(); // List of buildings owned by the player
 	private List<Road> roads = new ArrayList<>(); // List of roads owned by the player
-	private Agent agent; // Player's decision making agent
+	private PlayerAgent agent; // Player's decision making agent
 
 	/**
 	 * Constructor to initialize Player with a decision making Agent
 	 * @param id player id
 	 * @param agent decision making agent
 	 */
-	public Player(int id, Agent agent) {
+	public Player(int id, PlayerAgent agent) {
 		this.id = id;
 		this.agent = (agent == null) ? new Agent(id) : agent;
 		this.agent.setControlledPlayer(this);
@@ -33,7 +33,7 @@ public class Player {
 	 * Alternate constructor with default id
 	 * @param agent decision making agent
 	 */
-	public Player(Agent agent) {
+	public Player(PlayerAgent agent) {
 		this(-1, agent);
 	}
 

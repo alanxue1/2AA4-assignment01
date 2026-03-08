@@ -10,7 +10,7 @@ import java.util.Random;
 /**
  * Agent that decides what actions a player should take
  */
-public class Agent {
+public class Agent implements PlayerAgent {
 	/** agent's identifier */
 	private int id;
 	/** player controlled by this agent */
