@@ -13,6 +13,7 @@ public class Board {
 	private Node[] nodes = new Node[54];
 	/** list of edges on the board */
 	private List<Edge> edges = new ArrayList<>(); 
+	private Robber robber;
 
 	/**
 	 * Initializes the board with default configuration
@@ -20,6 +21,12 @@ public class Board {
 	public void initializeMap() {
 		edges.clear();
 		DefaultBoardSetup.configureBoard(this);
+		for (Tile tile: tiles) {
+			if (tile != null &&tile.getResourceType() ==ResourceType.DESERT) {
+				this.robber = new Robber(tile);
+				break;
+			}
+		}
 	}
 
 	/**
@@ -134,5 +141,14 @@ public class Board {
 	 */
 	public List<Edge> getEdges() {
 		return new ArrayList<>(edges);
+	}
+	
+
+		/**
+	 * Getter method for robber
+	 * @return returns robber
+	 */
+	public Robber getRobber() {
+		return robber;
 	}
 }
