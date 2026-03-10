@@ -201,6 +201,38 @@ public class Game {
 	 * Moves robber to random non-desert tile and steals from a qualifying player.
 	 */
 	private void handleRobber(Player currentPlayer) {
+		for (Player p: players) {
+			if (p==null) {
+				continue;
+			}
+
+			ResourceHand hand = p.getResourceHand();
+
+
+			if (hand.totalCards()>7) {
+				int toDiscard = hand.totalCards()/2;
+				int discarded = 0;
+				for (ResourceType type: ResourceType.values()) {
+					if (discarded >= toDiscard) {
+						break;
+					}
+
+					if (ResourceType.DESERT == type) {
+						continue;
+					}
+
+					int count = hand.getCount(type);
+					int remove = Math.min(count, toDiscard-discarded);
+					if (remove> 0) {
+						hand.remove(type, remove);
+						discarded = discarded+ remove;
+					}
+				}
+
+				System.out.println(currentRound+ " Player "+ p.getId()+ " discarded " +toDiscard+" cards (had more than 7)");
+			}
+		}
+
 		Robber robber = board.getRobber();
 		if (robber == null) {
 			return;

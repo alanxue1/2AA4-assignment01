@@ -35,7 +35,7 @@ public class Demonstrator {
 
 		Game game = new Game(board, players, dice, config.getMaxRounds()); // game instance
 		game.setScanner(scanner);
-		game.setGameStatePath("game_state.json");
+		game.setGameStatePath("state.json");
 		game.start();
 	}
 
