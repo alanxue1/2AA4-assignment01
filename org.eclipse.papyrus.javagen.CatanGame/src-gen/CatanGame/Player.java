@@ -136,4 +136,11 @@ public class Player {
 	public void setId(int id) {
 		this.id = id;
 	}
+
+	/**
+	 * @return true if this player is controlled by a human
+	 */
+	public boolean isInteractive() {
+		return agent != null && agent.isInteractive();
+	}
 }

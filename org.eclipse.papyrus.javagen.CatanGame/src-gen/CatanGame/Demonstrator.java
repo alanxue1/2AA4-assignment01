@@ -2,12 +2,14 @@ package CatanGame;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Scanner;
 
 /**
- * Demonstrator entry point for Assignment 1.
+ * Demonstrator entry point for Assignment 2.
  *
- * This class wires all simulator parts together, then runs one full game.
- * You can pass a custom config file path as the first command-line argument.
+ * Player 1 is a human player controlled via console commands.
+ * Players 2-4 are AI agents.
+ * Game state is exported to JSON for visualizer integration.
  */
 public class Demonstrator {
 	/**
@@ -21,15 +23,19 @@ public class Demonstrator {
 		Board board = new Board(); // game board
 		DefaultBoardSetup.configureBoard(board);
 
+		Scanner scanner = new Scanner(System.in); // shared scanner for human input
+
 		Player[] players = new Player[4]; // array of all players
-		for (int i = 0; i < players.length; i++) {
-			Agent agent = new Agent(i + 1); // agent for this player
-			players[i] = new Player(i + 1, agent);
+		players[0] = new Player(1, new HumanAgent(scanner)); // human player
+		for (int i = 1; i < players.length; i++) {
+			players[i] = new Player(i + 1, new Agent(i + 1)); // AI players
 		}
 
 		Dice dice = new MultiDice(); // dice for rolling
 
 		Game game = new Game(board, players, dice, config.getMaxRounds()); // game instance
+		game.setScanner(scanner);
+		game.setGameStatePath("game_state.json");
 		game.start();
 	}
 

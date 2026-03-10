@@ -7,10 +7,11 @@ package CatanGame;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Scanner;
 
 /************************************************************/
 /**
- * 
+ *
  */
 public class Game {
 	/** current round number */
@@ -31,6 +32,10 @@ public class Game {
 	private List<Road> roads;
 	/** random number generator for initial placements */
 	private Random random;
+	/** scanner for pausing between AI turns (keep forward) */
+	private Scanner scanner;
+	/** path for game state JSON export */
+	private String gameStatePath;
 
 	/**
 	 * Constructor for the game
@@ -59,6 +64,22 @@ public class Game {
 	}
 
 	/**
+	 * Sets the scanner used for keep-forward pausing
+	 * @param scanner scanner for human input
+	 */
+	public void setScanner(Scanner scanner) {
+		this.scanner = scanner;
+	}
+
+	/**
+	 * Sets the file path for JSON game state export
+	 * @param path file path for game state output
+	 */
+	public void setGameStatePath(String path) {
+		this.gameStatePath = path;
+	}
+
+	/**
 	 * Starts the game and runs until termination
 	 */
 	public void start() {
@@ -70,12 +91,14 @@ public class Game {
 		}
 
 		runInitialPlacement();
+		exportGameState();
 
 		while (!checkTerminationCondition()) {
 			playRound();
 		}
 
 		printFinalResults();
+		exportGameState();
 	}
 
 	/**
@@ -90,22 +113,163 @@ public class Game {
 			if (player == null) {
 				continue;
 			}
-			int rollResult = dice.roll(); // dice result for this turn
-			if (rollResult != 7) {
-				resourceDistributor(rollResult);
+
+			if (player.isInteractive()) {
+				playHumanTurn(player);
+			} else {
+				playAiTurn(player);
 			}
 
-			Action action = player.takeTurn(this); // action chosen by player
-			if (action == null) {
-				action = new Pass();
-			}
-			System.out.println("[" + currentRound + "] / [" + player.getId() + "]: rolled " + rollResult + ", " + action.getActionExplanation());
+			exportGameState();
 
 			if (checkTerminationCondition()) {
 				break;
 			}
 		}
 		printRoundSummary();
+	}
+
+	/**
+	 * Handles an AI player's turn
+	 */
+	private void playAiTurn(Player player) {
+		int rollResult = dice.roll(); // dice result for this turn
+
+		if (rollResult == 7) {
+			handleRobber(player);
+		} else {
+			resourceDistributor(rollResult);
+		}
+
+		Action action = player.takeTurn(this); // action chosen by player
+		if (action == null) {
+			action = new Pass();
+		}
+		System.out.println("[" + currentRound + "] / [" + player.getId() + "]: rolled " + rollResult + ", " + action.getActionExplanation());
+
+		// Keep forward: pause for human to read AI actions
+		if (hasHumanPlayer() && scanner != null) {
+			System.out.println("Press Enter to continue...");
+			if (scanner.hasNextLine()) {
+				scanner.nextLine();
+			}
+		}
+	}
+
+	/**
+	 * Handles a human player's turn
+	 */
+	private void playHumanTurn(Player player) {
+		System.out.println("\n=== Your turn (Player " + player.getId() + ") ===");
+		System.out.println("Type 'roll' to roll the dice.");
+
+		int rollResult = dice.roll(); // dice result for this turn
+		// The HumanAgent handles the roll command; we pre-roll and display the result
+		// after the agent processes the "roll" command
+
+		// Store the roll result so the agent can trigger it
+		this.lastRollResult = rollResult;
+
+		Action action = player.takeTurn(this); // HumanAgent manages the full turn
+		if (action == null) {
+			action = new Pass();
+		}
+
+		System.out.println("[" + currentRound + "] / [" + player.getId() + "]: " + action.getActionExplanation());
+	}
+
+	/** Stores last dice roll for human turn flow */
+	private int lastRollResult;
+
+	/**
+	 * Called by HumanAgent after the human types "roll".
+	 * Rolls dice, distributes resources, and returns the result.
+	 * @return the dice roll result
+	 */
+	public int rollDiceForHuman() {
+		int rollResult = lastRollResult;
+		if (rollResult == 7) {
+			handleRobber(null);
+		} else {
+			resourceDistributor(rollResult);
+		}
+		return rollResult;
+	}
+
+	/**
+	 * Handles robber activation when a 7 is rolled.
+	 * Moves robber to random non-desert tile and steals from a qualifying player.
+	 */
+	private void handleRobber(Player currentPlayer) {
+		Robber robber = board.getRobber();
+		if (robber == null) {
+			return;
+		}
+
+		// Find a random tile that is not desert and not already robbed
+		List<Tile> candidates = new ArrayList<>();
+		for (Tile tile : board.getTiles()) {
+			if (tile == null) {
+				continue;
+			}
+			if (tile.getResourceType() == ResourceType.DESERT) {
+				continue;
+			}
+			if (tile == robber.getCurrentTile()) {
+				continue;
+			}
+			candidates.add(tile);
+		}
+
+		if (candidates.isEmpty()) {
+			return;
+		}
+
+		Tile targetTile = candidates.get(random.nextInt(candidates.size()));
+		robber.moveRobber(targetTile);
+		System.out.println("[" + currentRound + "] Robber moved to tile " + targetTile.getId() + " (" + targetTile.getResourceType() + ")");
+
+		// Find qualifying players with buildings adjacent to robbed tile
+		List<Player> qualifyingPlayers = new ArrayList<>();
+		for (Node node : targetTile.getAdjacentNodes()) {
+			if (node == null || node.getBuilding() == null) {
+				continue;
+			}
+			Player owner = node.getBuilding().getOwner();
+			if (owner != currentPlayer && !qualifyingPlayers.contains(owner)) {
+				qualifyingPlayers.add(owner);
+			}
+		}
+
+		if (qualifyingPlayers.isEmpty()) {
+			return;
+		}
+
+		// Randomly select a player to steal from
+		Player victim = qualifyingPlayers.get(random.nextInt(qualifyingPlayers.size()));
+		ResourceHand victimHand = victim.getResourceHand();
+
+		// Build list of stealable resource types
+		List<ResourceType> stealable = new ArrayList<>();
+		for (ResourceType type : ResourceType.values()) {
+			if (type == ResourceType.DESERT) {
+				continue;
+			}
+			if (victimHand.getCount(type) > 0) {
+				stealable.add(type);
+			}
+		}
+
+		if (stealable.isEmpty()) {
+			return;
+		}
+
+		ResourceType stolenType = stealable.get(random.nextInt(stealable.size()));
+		victimHand.remove(stolenType, 1);
+		if (currentPlayer != null) {
+			currentPlayer.getResourceHand().add(stolenType, 1);
+		}
+		System.out.println("[" + currentRound + "] Stole 1 " + stolenType + " from Player " + victim.getId());
 	}
 
 	/**
@@ -165,12 +329,12 @@ public class Game {
 				} else {
 					continue;
 				}
-				
+
 				Player owner = building.getOwner(); // player who owns the building
 				distribution.add(new ResourceDistribution(owner, numberOfCardsToGive, resourceType));
 			}
 		}
-		
+
 		return distribution;
 	}
 
@@ -265,6 +429,42 @@ public class Game {
 	 */
 	public Player[] getPlayers() {
 		return players == null ? new Player[0] : players.clone();
+	}
+
+	/**
+	 * @return current round number
+	 */
+	public int getCurrentRound() {
+		return currentRound;
+	}
+
+	/**
+	 * @return list of all buildings
+	 */
+	public List<Building> getBuildings() {
+		return new ArrayList<>(buildings);
+	}
+
+	/**
+	 * @return list of all roads
+	 */
+	public List<Road> getRoads() {
+		return new ArrayList<>(roads);
+	}
+
+	private boolean hasHumanPlayer() {
+		for (Player player : players) {
+			if (player != null && player.isInteractive()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private void exportGameState() {
+		if (gameStatePath != null) {
+			GameStateExporter.export(this, gameStatePath);
+		}
 	}
 
 	private void runInitialPlacement() {

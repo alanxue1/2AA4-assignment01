@@ -11,7 +11,8 @@ import org.junit.platform.suite.api.SuiteDisplayName;
     BoardTest.class,
     ConfigTest.class,
     BuildingAndRoadTest.class,
-    GameAndActionTest.class
+    GameAndActionTest.class,
+    HumanInputParserTest.class
 })
 class AllTestsSuite {
 }
