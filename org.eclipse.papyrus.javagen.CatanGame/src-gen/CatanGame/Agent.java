@@ -5,7 +5,6 @@ package CatanGame;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Agent that decides what actions a player should take
@@ -15,23 +14,35 @@ public class Agent implements PlayerAgent {
 	private int id;
 	/** player controlled by this agent */
 	private Player controls; 
-	/** random number generator for decision making */
-	private final Random random = new Random();
+	/** strategy for selecting actions */
+	private ActionSelectionStrat strategy;
 
 	/**
 	 * Default constructor with id -1
 	 */
 	public Agent() {
-		this(-1);
+			this(-1);
 	}
 
 	/**
-	 * Constructor with specified id
-	 * @param id agent identifier
+	 * Constructor but it has specified id and a default random strategy
+	 * @param id to identify the agent
 	 */
 	public Agent(int id) {
-		this.id = id;
+			this.id=id;
+			this.strategy = new RandomStratAction();
 	}
+	/**
+	 * Constructor with but with id and strategy
+	 * @param id to identify the agent
+	 * @param strategy The selection strategy for actions that will be used
+	 */
+	public Agent(int id, ActionSelectionStrat strategy) {
+			this.id =id;
+			this.strategy =strategy;
+	}
+
+
 
 	/**
 	 * Chooses an action for the player to take
@@ -40,27 +51,21 @@ public class Agent implements PlayerAgent {
 	 * @return action to execute
 	 */
 	public Action chooseAction(Player player, Game game) {
-		Board board = game.getBoard(); // game board
-		ResourceHand hand = player.getResourceHand(); // player's resources
-		List<Action> buildActions = new ArrayList<>(); // possible build actions
-
-		if (hand.canAfford(BuildCosts.ROAD)) {
-			buildActions.addAll(getLegalRoadActions(player, board));
-		}
-		if (hand.canAfford(BuildCosts.SETTLEMENT)) {
-			buildActions.addAll(getLegalSettlementActions(player, board));
-		}
-		if (hand.canAfford(BuildCosts.CITY)) {
-			buildActions.addAll(getLegalCityActions(player));
-		}
-
-		if (hand.totalCards() > 7 && !buildActions.isEmpty()) {
-			return chooseRandomAction(buildActions);
-		}
-
-		List<Action> allActions = new ArrayList<>(buildActions); // all available actions
-		allActions.add(new Pass());
-		return chooseRandomAction(allActions);
+			Board board=game.getBoard(); // gameboard
+			ResourceHand hand=player.getResourceHand(); // players resources
+			List<Action> buildActions=new ArrayList<>(); // possible build actions
+			if (hand.canAfford(BuildCosts.ROAD)) {
+					buildActions.addAll(getLegalRoadActions(player,board));
+			}
+			if (hand.canAfford(BuildCosts.SETTLEMENT)) {
+					buildActions.addAll(getLegalSettlementActions(player,board));
+			}
+			if (hand.canAfford(BuildCosts.CITY)) {
+					buildActions.addAll(getLegalCityActions(player));
+			}
+			List<Action> allActions = new ArrayList<>(buildActions); // all actions allowed and available
+			allActions.add(new Pass());
+			return strategy.selectAction(allActions,player,game);
 	}
 
 	/**
@@ -83,10 +88,6 @@ public class Agent implements PlayerAgent {
 	 */
 	public void setControlledPlayer(Player controls) {
 		this.controls = controls;
-	}
-
-	private Action chooseRandomAction(List<Action> actions) {
-		return actions.get(random.nextInt(actions.size()));
 	}
 
 	private List<Action> getLegalRoadActions(Player player, Board board) {
