@@ -28,7 +28,7 @@ public class Demonstrator {
 		Player[] players = new Player[4]; // array of all players
 		players[0] = new Player(1, new HumanAgent(scanner)); // human player
 		for (int i = 1; i < players.length; i++) {
-			players[i] = new Player(i + 1, new Agent(i + 1, new ValueBasedStrat())); //AI players
+			players[i] = new Player(i + 1, new Agent(i + 1, new ConstraintBasedStrat(new ValueBasedStrat()))); //AI players
 		}
 
 		Dice dice = new MultiDice(); // dice for rolling
