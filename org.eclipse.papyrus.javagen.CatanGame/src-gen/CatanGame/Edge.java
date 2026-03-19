@@ -56,6 +56,13 @@ public class Edge {
 	}
 
 	/**
+	 * Removes the road currently placed on this edge.
+	 */
+	public void removeRoad() {
+		this.road = null;
+	}
+
+	/**
 	 * @return road on this edge
 	 */
 	public Road getRoad() {

@@ -62,6 +62,13 @@ public class Node {
 	}
 
 	/**
+	 * Removes the building currently placed on this node.
+	 */
+	public void removeBuilding() {
+		this.building = null;
+	}
+
+	/**
 	 * Adds node to adjacency list if not already present
 	 * @param node node to add
 	 */

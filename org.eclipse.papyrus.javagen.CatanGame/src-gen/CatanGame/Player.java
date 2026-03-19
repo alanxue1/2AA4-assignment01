@@ -87,6 +87,14 @@ public class Player {
 	}
 
 	/**
+	 * Removes a road from the player's collection
+	 * @param road The road to be removed
+	 */
+	public void removeRoad(Road road) {
+		roads.remove(road);
+	}
+
+	/**
 	 * Returns the player's current hand of resource cards
 	 * @return ResourceHand representing the player's current hand
 	 */
