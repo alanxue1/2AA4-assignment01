@@ -49,6 +49,13 @@ public class BuildRoad extends Action {
 	}
 
 	/**
+	 * @return the target edge for this road action
+	 */
+	public Edge getEdge() {
+		return edge;
+	}
+
+	/**
 	 * Undoes the action of building a road
 	 * @param game Current game instance
 	 * @param player Player whose action is being undone
