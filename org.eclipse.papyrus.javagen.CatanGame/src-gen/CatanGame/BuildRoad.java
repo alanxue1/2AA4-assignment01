@@ -9,7 +9,7 @@ package CatanGame;
  * Class to build a road at an edge for a player 
  */
 public class BuildRoad extends Action {
-	/** edge where road will be built */
+	/** The edge where the road will be built */
 	private Edge edge; 
 
 	/**
