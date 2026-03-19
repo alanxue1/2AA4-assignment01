@@ -31,14 +31,17 @@ public class HumanAgent implements PlayerAgent {
 	}
 
 	/**
-	 * Manages a full human turn: roll -> (list|build)* -> go.
-	 * Build actions are executed immediately within the loop.
-	 * Returns Pass when the human types "go".
+	 * Manages a full human turn: roll -> (list|build|undo|redo)* -> go.
+	 * Build actions are executed through command history.
+	 * @param player Player taking the turn
+	 * @param game Current game instance
+	 * @return The last action object created during the turn
 	 */
 	@Override
 	public Action chooseAction(Player player, Game game) {
 		turnStatus.reset();
-		Action lastAction = new Pass();
+		Action lastAction = new Pass(); // tracks action returned at end of turn
+		CommandHistory history = new CommandHistory(); // per-turn undo/redo stack
 
 		while (!turnStatus.isComplete()) {
 			System.out.print("> ");
@@ -49,7 +52,7 @@ public class HumanAgent implements PlayerAgent {
 			CommandParsed command = parser.parse(input);
 
 			if (command == null) {
-				System.out.println("Invalid command. Try: roll, go, list, build [settlement|city|road] [args]");
+				System.out.println("Invalid command. Try: roll, go, list, undo, redo, build [settlement|city|road] [args]");
 				continue;
 			}
 
@@ -59,7 +62,7 @@ public class HumanAgent implements PlayerAgent {
 				if (turnStatus.getCurStatus() == TurnStatus.BEGIN) {
 					System.out.println("You must roll first.");
 				} else {
-					System.out.println("Invalid command at this point. Use: list, build, or go.");
+					System.out.println("Invalid command at this point. Use: list, build, undo, redo, or go.");
 				}
 				continue;
 			}
@@ -77,9 +80,23 @@ public class HumanAgent implements PlayerAgent {
 			} else if ("build".equals(type)) {
 				Action buildAction = handleBuildCommand(command, player, game);
 				if (buildAction != null) {
-					buildAction.execute(game, player);
-					lastAction = buildAction;
+					history.executeCommand(buildAction, game, player);
+					lastAction = new Pass();
 					System.out.println("Executed: " + buildAction.getActionExplanation());
+				}
+			} else if ("undo".equals(type)) {
+				if (history.undoCommand(game, player)) {
+					lastAction = new Pass();
+					System.out.println("Undid last action");
+				} else {
+					System.out.println("No actions to undo");
+				}
+			} else if ("redo".equals(type)) {
+				if (history.redoCommand(game, player)) {
+					lastAction = new Pass();
+					System.out.println("Redid the last undon action");
+				} else {
+					System.out.println("No actions to redo");
 				}
 			}
 		}

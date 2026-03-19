@@ -21,9 +21,16 @@ public abstract class Action {
 	}
 
 	/**
-	 * Execute the action - implementation defined in subclasses
+	 * Execute the action
 	 * @param game Game instance 
 	 * @param player Player which action is being performed by
 	 */
 	public abstract void execute(Game game, Player player);
+
+	/**
+	 * Undo the action
+	 * @param game Current game instance 
+	 * @param player Player which the action is being undone for 
+	 */
+	public abstract void undo(Game game, Player player);
 }

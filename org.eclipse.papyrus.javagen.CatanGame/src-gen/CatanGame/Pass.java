@@ -20,4 +20,14 @@ public class Pass extends Action {
 	public void execute(Game game, Player player) {
 		return; // No action taken. The player just skips their turn 
 	}
+
+	/**
+	 * Undoes the passing action
+	 * @param game The current game instance
+	 * @param player Player whose action is being undone
+	 */
+	@Override
+	public void undo(Game game, Player player) {
+		return; 
+	}
 }

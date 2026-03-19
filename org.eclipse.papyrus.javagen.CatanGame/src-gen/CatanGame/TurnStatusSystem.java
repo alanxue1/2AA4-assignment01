@@ -36,6 +36,7 @@ public class TurnStatusSystem {
   /**
    * Verifies state condition for the given input (i.e. checks if the given input is a valid action for the current state in the state machine)
    * @param input the action to be checked
+   * @return true if the action is allowed in the current state, otherwise false
    */
   public boolean allowedToBegin(String input) {
     if (curStatus == TurnStatus.BEGIN) {
@@ -47,7 +48,7 @@ public class TurnStatusSystem {
     }
 
     if (curStatus == TurnStatus.ROLLDICE) {
-      if (input.equals("list") || input.equals("build") || input.equals("go")) {
+      if (input.equals("list") || input.equals("build") || input.equals("go") || input.equals("undo") || input.equals("redo")) {
         return true;
       } else {
         return false;

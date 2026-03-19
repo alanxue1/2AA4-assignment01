@@ -450,6 +450,17 @@ public class Game {
 	}
 
 	/**
+	 * Removes a road from the game.
+	 * @param road road to remove
+	 */
+	public void removeRoad(Road road) {
+		if (road == null) {
+			return;
+		}
+		roads.remove(road);
+	}
+
+	/**
 	 * @return game board
 	 */
 	public Board getBoard() {

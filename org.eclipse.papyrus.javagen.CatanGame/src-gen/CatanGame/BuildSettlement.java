@@ -11,6 +11,8 @@ package CatanGame;
 public class BuildSettlement extends Action {
 	/** location where settlement will be built */
 	private Node node; 
+	/** settlement created during execute() */
+	private Settlement createdSettlement;
 	
 	/**
 	 * Constructor to initialize the node where the settlement will be built and set the action explanation
@@ -49,5 +51,25 @@ public class BuildSettlement extends Action {
 		game.addBuilding(settlement);
 		player.addBuilding(settlement);
 		player.collectPoints(settlement.getVictoryPoints());
+		createdSettlement = settlement;
+	}
+
+	/**
+	 * Undoes the action of building a settlement
+	 * @param game The current Catan game instance 
+	 * @param player Player whose action is being undone
+	 */
+	@Override
+	public void undo(Game game, Player player) {
+		if (createdSettlement == null || node == null) {
+			return;
+		}
+		if (node.getBuilding() == createdSettlement) {
+			node.removeBuilding();
+		}
+		player.deleteBuilding(createdSettlement);
+		game.removeBuilding(createdSettlement);
+		player.collectPoints(-createdSettlement.getVictoryPoints());
+		player.getResourceHand().refund(BuildCosts.SETTLEMENT);
 	}
 }

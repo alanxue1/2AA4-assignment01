@@ -88,4 +88,22 @@ public class ResourceHand {
 			remove(entry.getKey(), entry.getValue());
 		}
 	}
+
+	/**
+	 * Refunds resources back to the hand
+	 * @param cost resource set to refund
+	 */
+	public void refund(Map<ResourceType, Integer> cost) {
+		if (cost == null || cost.isEmpty()) {
+			return;
+		}
+
+		// Only refund valid resource types and positive amounts
+		for (Map.Entry<ResourceType, Integer> entry : cost.entrySet()) {
+			if (entry.getKey() == null || entry.getValue() == null || entry.getValue() <= 0) {
+				continue;
+			}
+			add(entry.getKey(), entry.getValue());
+		}
+	}
 }

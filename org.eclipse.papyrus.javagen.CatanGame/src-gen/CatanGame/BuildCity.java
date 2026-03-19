@@ -11,6 +11,10 @@ package CatanGame;
 public class BuildCity extends Action {
 	/** location where city will be built */
 	private Node node; 
+	/** city created during the execute() method*/
+	private City createdCity;
+	/** settlement replaced during the execute() method */
+	private Settlement previousSettlement;
 
 	/**
 	 * Constructor to create the city 
@@ -44,6 +48,7 @@ public class BuildCity extends Action {
 			return;
 		}
 		hand.spend(BuildCosts.CITY);
+		previousSettlement = (Settlement) currentBuilding;
 
 		player.deleteBuilding(currentBuilding);
 		game.removeBuilding(currentBuilding);
@@ -52,5 +57,30 @@ public class BuildCity extends Action {
 		game.addBuilding(city); 
 		player.addBuilding(city);
 		player.collectPoints(city.getVictoryPoints() - currentBuilding.getVictoryPoints());
+		createdCity = city;
+	}
+
+	/**
+	 * Undoes the action of upgrading a settlement to a city
+	 * @param game Current game instance
+	 * @param player Player whose action is being undone
+	 */
+	@Override
+	public void undo(Game game, Player player) {
+		if (createdCity == null || node == null || previousSettlement == null) {
+			return;
+		}
+
+		if (node.getBuilding() == createdCity) {
+			node.removeBuilding();
+		}
+		player.deleteBuilding(createdCity);
+		game.removeBuilding(createdCity);
+
+		node.addBuilding(previousSettlement);
+		game.addBuilding(previousSettlement);
+		player.addBuilding(previousSettlement);
+		player.collectPoints(previousSettlement.getVictoryPoints() - createdCity.getVictoryPoints());
+		player.getResourceHand().refund(BuildCosts.CITY);
 	}
 }

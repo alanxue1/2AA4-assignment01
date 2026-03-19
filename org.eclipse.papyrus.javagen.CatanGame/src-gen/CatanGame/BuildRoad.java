@@ -11,6 +11,8 @@ package CatanGame;
 public class BuildRoad extends Action {
 	/** The edge where the road will be built */
 	private Edge edge; 
+	/** The road created during execute() */
+	private Road createdRoad;
 
 	/**
 	 * Constructor to initialize the edge where the road will be built and set the action explanation
@@ -43,5 +45,24 @@ public class BuildRoad extends Action {
 		Road road = new Road(player, edge); // new road to build
 		game.addRoad(road);
 		player.addRoad(road);
+		createdRoad = road;
+	}
+
+	/**
+	 * Undoes the action of building a road
+	 * @param game Current game instance
+	 * @param player Player whose action is being undone
+	 */
+	@Override
+	public void undo(Game game, Player player) {
+		if (createdRoad == null || edge == null) {
+			return;
+		}
+		if (edge.getRoad() == createdRoad) {
+			edge.removeRoad();
+		}
+		player.removeRoad(createdRoad);
+		game.removeRoad(createdRoad);
+		player.getResourceHand().refund(BuildCosts.ROAD);
 	}
 }
