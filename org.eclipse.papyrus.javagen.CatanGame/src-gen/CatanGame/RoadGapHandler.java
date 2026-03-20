@@ -5,7 +5,7 @@ import java.util.Set;
 
 /**
  * Constraint: if the player has two disconnected road segments whose
- * endpoints are at most two edges apart, build a road to start connecting them.
+ * endpoints are at most two edges apart, build a roa
  */
 public class RoadGapHandler extends ConstraintHandler {
 
@@ -15,12 +15,12 @@ public class RoadGapHandler extends ConstraintHandler {
             return null;
         }
 
-        List<Set<Edge>> components = RoadNetworkUtil.findComponents(player, game.getBoard());
+        List<Set<Edge>> components = RoadNetworkUtil.getRoadGroups(player, game.getBoard());
         if (components.size() < 2) {
             return null;
         }
 
-        Edge bridge = RoadNetworkUtil.findBridgingEdge(components, game.getBoard());
+        Edge bridge = RoadNetworkUtil.getEdgeToConnectGroups(components, game.getBoard());
         if (bridge == null) {
             return null;
         }

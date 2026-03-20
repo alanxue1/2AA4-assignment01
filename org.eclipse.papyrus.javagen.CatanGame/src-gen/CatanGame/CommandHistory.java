@@ -4,7 +4,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 /**
- * Maintains command history for undo/redo behavior
+ * Maintains command history for undo/redo behaviour 
  */
 public class CommandHistory {
 	/** Stack of commands that can be undone */

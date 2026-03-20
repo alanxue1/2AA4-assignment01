@@ -16,14 +16,14 @@ public class LongestRoadThreatHandler extends ConstraintHandler {
         }
 
         Board board = game.getBoard();
-        int myLongest = RoadNetworkUtil.computeLongestRoad(player, board);
+        int myLongest = RoadNetworkUtil.getLongestRoadCount(player, board);
 
         boolean threatened = false;
         for (Player opponent : game.getPlayers()) {
             if (opponent == null || opponent == player) {
                 continue;
             }
-            int opponentLongest = RoadNetworkUtil.computeLongestRoad(opponent, board);
+            int opponentLongest = RoadNetworkUtil.getLongestRoadCount(opponent, board);
             if (opponentLongest >= myLongest - 1) {
                 threatened = true;
                 break;
