@@ -14,7 +14,7 @@ import java.util.Scanner;
  *
  */
 public class Game {
-	/** current round number */
+	/** The current round number */
 	private int currentRound;
 	/** maximum rounds before game ends */
 	private int maxRounds;
