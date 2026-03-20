@@ -4,7 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Parses human console input into structured game commands.
+ * Parses human console input into structured game commands
  */
 public class HumanInputParser {
 

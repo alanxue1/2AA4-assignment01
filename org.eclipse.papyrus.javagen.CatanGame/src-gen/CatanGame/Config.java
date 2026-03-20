@@ -6,7 +6,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 /**
- * Reads simulator configuration from a text file.
+ * Reads simulator configuration from a text file
  * Expected format:
  * turns: <int>
  */

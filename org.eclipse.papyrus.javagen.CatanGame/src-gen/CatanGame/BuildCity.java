@@ -53,7 +53,7 @@ public class BuildCity extends Action {
 		player.deleteBuilding(currentBuilding);
 		game.removeBuilding(currentBuilding);
 
-		City city = new City(player, node); // new city to build
+		City city = new City(player, node); // The new city to build
 		game.addBuilding(city); 
 		player.addBuilding(city);
 		player.collectPoints(city.getVictoryPoints() - currentBuilding.getVictoryPoints());

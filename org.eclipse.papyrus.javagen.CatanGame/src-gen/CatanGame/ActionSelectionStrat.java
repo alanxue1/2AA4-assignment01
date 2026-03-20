@@ -2,8 +2,7 @@ package CatanGame;
 import java.util.List;
 
 /**
- * This is an interface for the choosing a action
- * This encapsulate decision making algorithms.
+ * Interface for choosing an action 
  */
 public interface ActionSelectionStrat {
     /**
